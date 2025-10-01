@@ -1,6 +1,10 @@
 #!/bin/bash
 echo "Análisis de JSON"
 echo "=================="
+
+
+# Script: proceso - Nacho
+
 echo "Petición de estaciones de la provincia de Valencia" > log.txt
 
 urlValencia='https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46'
@@ -58,4 +62,19 @@ estaciones=$(echo "$getEstacionesValencia" | jq '[
     }
 ]')
 
-echo "$estaciones"
+$totalEESS = (estaciones | length)
+
+$mediaPrecioDiesel = '1,29'
+
+$mediaPrecio = '1,30'
+
+# PRUEBA Guardar el JSON formateado en archivo
+echo "$estaciones" > "$archivoGuardar"
+
+# Generar mas variables para utilizarlas en los informes
+
+#-------------------
+
+# Generar Informes y Texto - JF
+# Generar HTML y TXT
+
