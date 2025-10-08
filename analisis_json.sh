@@ -53,8 +53,7 @@ generar_informe_txt() {
     echo "=============================================="
     echo "Fin del informe generado automáticamente."
     echo "=============================================="
-  }
-   > "$NOMBRE_ARCHIVO_INFORME_TXT"
+  } > "$NOMBRE_ARCHIVO_INFORME_TXT"
 
   echo "✅ Informe generado en: $NOMBRE_ARCHIVO_INFORME_TXT" >> $NOMBRE_ARCHIVO_LOG
 }
@@ -69,13 +68,15 @@ crear_carpetas
 RUN_ID="$(date +%Y%m%d-%H%M%S)"
 
 # Nombre de archivos que se van a guardar
-NOMBRE_ARCHIVO_LOG="./log_${RUN_ID}.txt"
-NOMBRE_ARCHIVO_GUARDAR_ESTACIONES= "./datos/estacionesValencia_${RUN_ID}.json"
+NOMBRE_ARCHIVO_VARIOS_LOG="./log_${RUN_ID}.txt"
+
+NOMBRE_ARCHIVO_LOG="./log.txt"
+NOMBRE_ARCHIVO_GUARDAR_ESTACIONES="./datos/estacionesValencia_${RUN_ID}.json"
 
 NOMBRE_ARCHIVO_INFORME_TXT="./informes/informe_${RUN_ID}.txt"
 
 # Variables extraidas
-FECHA_CRON=$RUN_ID
+FECHA_CRON="$RUN_ID"
 FECHAS_API=""
 
 TOP5_G95=""
@@ -97,7 +98,7 @@ TOTAL_EESS_SIN_COORDENADAS=""
 
 
 # Igual hay que meter estas variables mas tarde (ojo con los >> log)
-echo "Identificador de la ejecución del CRON(FECHA)=$.RUN_ID" > $NOMBRE_ARCHIVO_LOG
+echo "Identificador de la ejecución del CRON(FECHA)=$RUN_ID" >> $NOMBRE_ARCHIVO_LOG
 
 echo "Petición de estaciones de la provincia de Valencia" >> $NOMBRE_ARCHIVO_LOG
 
@@ -129,7 +130,7 @@ echo "Comprobando que existe la variable con la lista de estaciones y precios" >
 echo "$getEstacionesValencia" | jq -e '.ListaEESSPrecio | type=="array"' >/dev/null 2>>$NOMBRE_ARCHIVO_LOG || { echo "Falta .ListaEESSPrecio[]" >> $NOMBRE_ARCHIVO_LOG; exit 1; }
 
 echo "Comprobando que existe la variable Fecha de la API" >> $NOMBRE_ARCHIVO_LOG
-echo "$getEstacionesValencia" | jq -e '.Fecha | type==""' >/dev/null 2>>$NOMBRE_ARCHIVO_LOG || { echo "Falta .ListaEESSPrecio[]" >> $NOMBRE_ARCHIVO_LOG; exit 1; }
+echo "$getEstacionesValencia" | jq -e '.Fecha | type=="string"' >/dev/null 2>>$NOMBRE_ARCHIVO_LOG || { echo "Falta .ListaEESSPrecio[]" >> $NOMBRE_ARCHIVO_LOG; exit 1; }
 
 
 echo "Procesando el JSON para extraer las variables necesarias" >> $NOMBRE_ARCHIVO_LOG
@@ -190,7 +191,8 @@ TOTAL_EESS_SIN_COORDENADAS=$(echo "$estaciones"| jq '[.[] | select(.lat==null or
 
 echo "[$(date '+%F %T')] [stats] INFO sin_G95=$TOTAL_EESS_SIN_PRECIO_GASOLINA sin_Diesel=$TOTAL_EESS_SIN_PRECIO_DIESEL sin_Coords=$TOTAL_EESS_SIN_COORDENADAS" >> $NOMBRE_ARCHIVO_LOG
 
-TOTAL_EESS = (estaciones | length)
+TOTAL_EESS=$(echo "$estaciones" | jq '. | length')
+
 
 generar_informe_txt
 # Generar mas variables para utilizarlas en los informes
