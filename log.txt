@@ -32,3 +32,111 @@ Estaciones procesadas: 643
 [2025-10-08 20:58:03] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
 Generando informe en txt
 ✅ Informe generado en: ./informes/informe_20251008-205802.txt
+Identificador de la ejecución del CRON(FECHA)=20251011-185600
+Petición de estaciones de la provincia de Valencia
+Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+Petición OK: Estado Petición HTTP = 200
+Comprobando que la variable no este vacia
+Comprobando que el JSON es válido
+Comprobando que existe la variable con la lista de estaciones y precios
+Comprobando que existe la variable Fecha de la API
+Procesando el JSON para extraer las variables necesarias
+Estaciones procesadas: 642
+[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
+[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
+[rank] INFO top5_g95 generado
+[rank] INFO top5_diesel generado
+[2025-10-11 18:56:02] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
+Generando informe en txt
+✅ Informe generado en: ./informes/informe_20251011-185600.txt
+Generando informe en html
+Identificador de la ejecución del CRON(FECHA)=20251011-190016
+Petición de estaciones de la provincia de Valencia
+Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+Petición OK: Estado Petición HTTP = 200
+Comprobando que la variable no este vacia
+Comprobando que el JSON es válido
+Comprobando que existe la variable con la lista de estaciones y precios
+Comprobando que existe la variable Fecha de la API
+Procesando el JSON para extraer las variables necesarias
+Estaciones procesadas: 642
+[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
+[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
+[rank] INFO top5_g95 generado
+[rank] INFO top5_diesel generado
+[2025-10-11 19:00:17] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
+Generando informe en txt
+✅ Informe generado en: ./informes/informe_20251011-190016.txt
+Generando informe en html
+Identificador de la ejecución del CRON(FECHA)=20251011-190718
+Petición de estaciones de la provincia de Valencia
+Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+Petición OK: Estado Petición HTTP = 200
+Comprobando que la variable no este vacia
+Comprobando que el JSON es válido
+Comprobando que existe la variable con la lista de estaciones y precios
+Comprobando que existe la variable Fecha de la API
+Procesando el JSON para extraer las variables necesarias
+Estaciones procesadas: 642
+[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
+[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
+[rank] INFO top5_g95 generado
+[rank] INFO top5_diesel generado
+[2025-10-11 19:07:20] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
+Generando informe en txt
+✅ Informe generado en: ./informes/informe_20251011-190718.txt
+Generando informe en html
+Identificador de la ejecución del CRON(FECHA)=20251011-190935
+Petición de estaciones de la provincia de Valencia
+Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+Petición OK: Estado Petición HTTP = 200
+Comprobando que la variable no este vacia
+Comprobando que el JSON es válido
+Comprobando que existe la variable con la lista de estaciones y precios
+Comprobando que existe la variable Fecha de la API
+Procesando el JSON para extraer las variables necesarias
+Estaciones procesadas: 642
+[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
+[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
+[rank] INFO top5_g95 generado
+[rank] INFO top5_diesel generado
+[2025-10-11 19:09:36] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
+Generando informe en txt
+✅ Informe generado en: ./informes/informe_20251011-190935.txt
+Generando informe en html
+Identificador de la ejecución del CRON(FECHA)=20251011-191102
+Petición de estaciones de la provincia de Valencia
+Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+Petición OK: Estado Petición HTTP = 200
+Comprobando que la variable no este vacia
+Comprobando que el JSON es válido
+Comprobando que existe la variable con la lista de estaciones y precios
+Comprobando que existe la variable Fecha de la API
+Procesando el JSON para extraer las variables necesarias
+Estaciones procesadas: 642
+[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
+[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
+[rank] INFO top5_g95 generado
+[rank] INFO top5_diesel generado
+[2025-10-11 19:11:03] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
+Generando informe en txt
+✅ Informe generado en: ./informes/informe_20251011-191102.txt
+Generando informe en html
+Identificador de la ejecución del CRON(FECHA)=20251011-191416
+Petición de estaciones de la provincia de Valencia
+Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+Petición OK: Estado Petición HTTP = 200
+Comprobando que la variable no este vacia
+Comprobando que el JSON es válido
+Comprobando que existe la variable con la lista de estaciones y precios
+Comprobando que existe la variable Fecha de la API
+Procesando el JSON para extraer las variables necesarias
+Estaciones procesadas: 642
+[stats] INFO G95 min=1.279 max=1.659 avg=1.462
+[stats] INFO Diesel min=1.199 max=1.569 avg=1.386
+[rank] INFO top5_g95 generado
+[rank] INFO top5_diesel generado
+[2025-10-11 19:14:17] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
+Generando informe en txt
+✅ Informe generado en: ./informes/informe_20251011-191416.txt
+Generando informe en html
