@@ -333,3 +333,32 @@ curl: (6) Could not resolve host: sedeaplicaciones.minetur.gob.es
 curl: (6) Could not resolve host: sedeaplicaciones.minetur.gob.es
 [2025-10-16 20:28:58] (Descarga) ERROR Ha fallado la petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46. Error HTTP: 000
 [2025-10-16 20:28:58] (Finalizacion) ERROR El programa terminó con código 1
+Empieza el programa
+==================
+✔️ Carpeta ya existe: /home/nacho/proyectos/shell-proyect/datos
+✔️ Carpeta ya existe: /home/nacho/proyectos/shell-proyect/informes
+✔️ Carpeta ya existe: /home/nacho/proyectos/shell-proyect/planificacion
+[2025-10-16 21:01:21] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-210121
+[2025-10-16 21:01:21] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 21:01:21] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 21:01:22] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 21:01:22] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 21:01:22] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 21:01:22] (Procesamiento) OK JSON válido
+[2025-10-16 21:01:22] (Procesamiento) INFO Verificando ListaEESSPrecio como array
+[2025-10-16 21:01:22] (Procesamiento) OK ListaEESSPrecio presente y es array
+[2025-10-16 21:01:22] (Procesamiento) INFO Verificando Fecha como string
+[2025-10-16 21:01:22] (Procesamiento) OK Fecha presente
+[2025-10-16 21:01:22] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 21:01:22] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 21:01:22] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 21:01:22] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 21:01:22] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 21:01:22] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 21:01:22] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 21:01:22] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 21:01:22] (Informe) INFO Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 21:01:22] (Informe) INFO Generando informe en txt
+[2025-10-16 21:01:22] (Informe) OK Informe generado en: /home/nacho/proyectos/shell-proyect/informes/informe_20251016-210121.txt
+Generando informe en html
+[2025-10-16 21:01:22] (Finalizacion) INFO El programa se ha ejecutado correctamente
