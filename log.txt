@@ -32,7 +32,7 @@ Estaciones procesadas: 643
 [2025-10-08 20:58:03] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
 Generando informe en txt
 ✅ Informe generado en: ./informes/informe_20251008-205802.txt
-Identificador de la ejecución del CRON(FECHA)=20251011-185600
+Identificador de la ejecución del CRON(FECHA)=20251016-182354
 Petición de estaciones de la provincia de Valencia
 Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
 Petición OK: Estado Petición HTTP = 200
@@ -41,16 +41,15 @@ Comprobando que el JSON es válido
 Comprobando que existe la variable con la lista de estaciones y precios
 Comprobando que existe la variable Fecha de la API
 Procesando el JSON para extraer las variables necesarias
-Estaciones procesadas: 642
-[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
-[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
+Estaciones procesadas: 644
+[stats] INFO G95 min=1.265 max=1.639 avg=1.462437293729375
+[stats] INFO Diesel min=1.185 max=1.569 avg=1.3890813397129185
 [rank] INFO top5_g95 generado
 [rank] INFO top5_diesel generado
-[2025-10-11 18:56:02] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 18:23:55] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
 Generando informe en txt
-✅ Informe generado en: ./informes/informe_20251011-185600.txt
-Generando informe en html
-Identificador de la ejecución del CRON(FECHA)=20251011-190016
+✅ Informe generado en: ./informes/informe_20251016-182354.txt
+Identificador de la ejecución del CRON(FECHA)=20251016-184754
 Petición de estaciones de la provincia de Valencia
 Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
 Petición OK: Estado Petición HTTP = 200
@@ -59,16 +58,15 @@ Comprobando que el JSON es válido
 Comprobando que existe la variable con la lista de estaciones y precios
 Comprobando que existe la variable Fecha de la API
 Procesando el JSON para extraer las variables necesarias
-Estaciones procesadas: 642
-[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
-[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
-[rank] INFO top5_g95 generado
-[rank] INFO top5_diesel generado
-[2025-10-11 19:00:17] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
+Estaciones procesadas: 644
+Métricas G95 min=1.265 max=1.639 avg=1.4622409240924115
+Métricas Diesel min=1.185 max=1.569 avg=1.3889457735247208
+Rango top5_g95 generado
+Rango top5_diesel generado
+[2025-10-16 18:47:55] Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
 Generando informe en txt
-✅ Informe generado en: ./informes/informe_20251011-190016.txt
-Generando informe en html
-Identificador de la ejecución del CRON(FECHA)=20251011-190718
+✅ Informe generado en: ./informes/informe_20251016-184754.txt
+Identificador de la ejecución del CRON(FECHA)=20251016-185350
 Petición de estaciones de la provincia de Valencia
 Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
 Petición OK: Estado Petición HTTP = 200
@@ -77,66 +75,261 @@ Comprobando que el JSON es válido
 Comprobando que existe la variable con la lista de estaciones y precios
 Comprobando que existe la variable Fecha de la API
 Procesando el JSON para extraer las variables necesarias
-Estaciones procesadas: 642
-[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
-[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
-[rank] INFO top5_g95 generado
-[rank] INFO top5_diesel generado
-[2025-10-11 19:07:20] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
-Generando informe en txt
-✅ Informe generado en: ./informes/informe_20251011-190718.txt
-Generando informe en html
-Identificador de la ejecución del CRON(FECHA)=20251011-190935
+Estaciones procesadas: 644
+Métricas G95 min=1.265 max=1.639 avg=1.4622409240924115
+Métricas Diesel min=1.185 max=1.569 avg=1.3889457735247208
+Rango top5_g95 generado
+[2025-10-16 18:53:51] Rango top5_diesel generado
+[2025-10-16 18:53:51] Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 18:53:51] INFO Generando informe en txt
+✅ Informe generado en: ./informes/informe_20251016-185350.txt
+Identificador de la ejecución del CRON(FECHA)=20251016-191202
 Petición de estaciones de la provincia de Valencia
 Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
-Petición OK: Estado Petición HTTP = 200
+curl: (6) Could not resolve host: sedeaplicaciones.minetur.gob.es
+Ha fallado la petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46. Error HTTP: 000
 Comprobando que la variable no este vacia
-Comprobando que el JSON es válido
+getEstacionesValencia vacío. Termino.
+[2025-10-16 19:28:19] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-192819
+[2025-10-16 19:28:19] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 19:28:19] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 19:28:21] (Descarga) INFO Petición OK: Estado Petición HTTP = 200
+[2025-10-16 19:28:21] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 19:28:21] (Procesamiento) INFO Comprobando que el JSON es válido
 Comprobando que existe la variable con la lista de estaciones y precios
 Comprobando que existe la variable Fecha de la API
 Procesando el JSON para extraer las variables necesarias
-Estaciones procesadas: 642
-[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
-[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
-[rank] INFO top5_g95 generado
-[rank] INFO top5_diesel generado
-[2025-10-11 19:09:36] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
-Generando informe en txt
-✅ Informe generado en: ./informes/informe_20251011-190935.txt
-Generando informe en html
-Identificador de la ejecución del CRON(FECHA)=20251011-191102
-Petición de estaciones de la provincia de Valencia
-Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
-Petición OK: Estado Petición HTTP = 200
-Comprobando que la variable no este vacia
-Comprobando que el JSON es válido
+Estaciones procesadas: 644
+Métricas G95 min=1.265 max=1.639 avg=1.4621336633663387
+Métricas Diesel min=1.185 max=1.569 avg=1.3888740031897926
+Rango top5_g95 generado
+[2025-10-16 19:28:21] Rango top5_diesel generado
+[2025-10-16 19:28:21] Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 19:28:21] (Informes) INFO Generando informe en txt
+[2025-10-16 19:28:21] (Informe) INFO Informe generado en: ./informes/informe_20251016-192819.txt
+[2025-10-16 19:32:06] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-193206
+[2025-10-16 19:32:06] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 19:32:06] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 19:32:06] (Descarga) INFO Petición OK: Estado Petición HTTP = 200
+[2025-10-16 19:32:06] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 19:32:06] (Procesamiento) INFO Comprobando que el JSON es válido
 Comprobando que existe la variable con la lista de estaciones y precios
 Comprobando que existe la variable Fecha de la API
 Procesando el JSON para extraer las variables necesarias
-Estaciones procesadas: 642
-[stats] INFO G95 min=1.279 max=1.659 avg=1.4621854304635764
-[stats] INFO Diesel min=1.199 max=1.569 avg=1.3861087999999995
-[rank] INFO top5_g95 generado
-[rank] INFO top5_diesel generado
-[2025-10-11 19:11:03] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
-Generando informe en txt
-✅ Informe generado en: ./informes/informe_20251011-191102.txt
-Generando informe en html
-Identificador de la ejecución del CRON(FECHA)=20251011-191416
-Petición de estaciones de la provincia de Valencia
-Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
-Petición OK: Estado Petición HTTP = 200
-Comprobando que la variable no este vacia
-Comprobando que el JSON es válido
+Estaciones procesadas: 644
+Métricas G95 min=1.265 max=1.639 avg=1.4620016501650186
+Métricas Diesel min=1.185 max=1.569 avg=1.3887464114832537
+Rango top5_g95 generado
+[2025-10-16 19:32:06] Rango top5_diesel generado
+[2025-10-16 19:32:06] Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 19:32:06] (Informes) INFO Generando informe en txt
+[2025-10-16 19:32:06] (Informe) INFO Informe generado en: ./informes/informe_20251016-193206.txt
+[2025-10-16 19:36:19] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-193619
+[2025-10-16 19:36:19] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 19:36:19] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 19:36:19] (Descarga) INFO Petición OK: Estado Petición HTTP = 200
+[2025-10-16 19:36:19] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 19:36:19] (Procesamiento) INFO Comprobando que el JSON es válido
 Comprobando que existe la variable con la lista de estaciones y precios
 Comprobando que existe la variable Fecha de la API
 Procesando el JSON para extraer las variables necesarias
-Estaciones procesadas: 642
-[stats] INFO G95 min=1.279 max=1.659 avg=1.462
-[stats] INFO Diesel min=1.199 max=1.569 avg=1.386
-[rank] INFO top5_g95 generado
-[rank] INFO top5_diesel generado
-[2025-10-11 19:14:17] [stats] INFO sin_G95=38 sin_Diesel=17 sin_Coords=0
-Generando informe en txt
-✅ Informe generado en: ./informes/informe_20251011-191416.txt
-Generando informe en html
+Estaciones procesadas: 644
+Métricas G95 min=1.265 max=1.639 avg=1.4620016501650186
+Métricas Diesel min=1.185 max=1.569 avg=1.3887464114832537
+Rango top5_g95 generado
+[2025-10-16 19:36:19] Rango top5_diesel generado
+[2025-10-16 19:36:19] Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 19:36:20] (Informe) INFO Generando informe en txt
+[2025-10-16 19:36:20] (Informe) INFO Informe generado en: ./informes/informe_20251016-193619.txt
+[2025-10-16 19:41:17] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-194117
+[2025-10-16 19:41:17] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 19:41:17] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 19:41:18] (Descarga) INFO Petición OK: Estado Petición HTTP = 200
+[2025-10-16 19:41:18] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 19:41:18] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 19:41:18] (Procesamiento) OK JSON válido
+[2025-10-16 19:41:18] (Procesamiento) INFO Verificando .ListaEESSPrecio como array
+[2025-10-16 19:41:18] (Procesamiento) OK .ListaEESSPrecio presente y es array
+[2025-10-16 19:41:18] (Procesamiento) INFO Verificando .Fecha como string
+[2025-10-16 19:41:18] (Procesamiento) OK .Fecha presente
+Procesando el JSON para extraer las variables necesarias
+Estaciones procesadas: 644
+Métricas G95 min=1.265 max=1.639 avg=1.4620016501650186
+Métricas Diesel min=1.185 max=1.569 avg=1.3887464114832537
+Rango top5_g95 generado
+[2025-10-16 19:41:18] Rango top5_diesel generado
+[2025-10-16 19:41:18] Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 19:41:18] (Informe) INFO Generando informe en txt
+[2025-10-16 19:41:18] (Informe) INFO Informe generado en: ./informes/informe_20251016-194117.txt
+[2025-10-16 20:00:03] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-200003
+[2025-10-16 20:00:03] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:00:03] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 20:00:04] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 20:00:04] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 20:00:04] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 20:00:04] (Procesamiento) OK JSON válido
+[2025-10-16 20:00:04] (Procesamiento) INFO Verificando .ListaEESSPrecio como array
+[2025-10-16 20:00:04] (Procesamiento) OK .ListaEESSPrecio presente y es array
+[2025-10-16 20:00:04] (Procesamiento) INFO Verificando .Fecha como string
+[2025-10-16 20:00:04] (Procesamiento) OK .Fecha presente
+[2025-10-16 20:00:04] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+Estaciones procesadas: 644
+[2025-10-16 20:00:04] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 20:00:04] (Informe)) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 20:00:04] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 20:00:04] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 20:00:04] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 20:00:04] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 20:00:04] Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 20:00:04] (Informe) INFO Generando informe en txt
+[2025-10-16 20:00:04] (Informe) INFO Informe generado en: ./informes/informe_20251016-200003.txt
+[2025-10-16 20:03:31] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-200331
+[2025-10-16 20:03:31] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:03:31] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 20:03:32] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 20:03:32] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 20:03:32] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 20:03:32] (Procesamiento) OK JSON válido
+[2025-10-16 20:03:32] (Procesamiento) INFO Verificando .ListaEESSPrecio como array
+[2025-10-16 20:03:32] (Procesamiento) OK .ListaEESSPrecio presente y es array
+[2025-10-16 20:03:32] (Procesamiento) INFO Verificando .Fecha como string
+[2025-10-16 20:03:32] (Procesamiento) OK .Fecha presente
+[2025-10-16 20:03:32] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 20:03:32] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 20:03:32] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 20:03:32] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 20:03:32] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 20:03:32] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 20:03:32] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 20:03:32] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 20:03:32] Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 20:03:32] (Informe) INFO Generando informe en txt
+[2025-10-16 20:03:32] (Informe) INFO Informe generado en: ./informes/informe_20251016-200331.txt
+[2025-10-16 20:07:23] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-200723
+[2025-10-16 20:07:23] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:07:23] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 20:07:24] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 20:07:24] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 20:07:24] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 20:07:24] (Procesamiento) OK JSON válido
+[2025-10-16 20:07:24] (Procesamiento) INFO Verificando .ListaEESSPrecio como array
+[2025-10-16 20:07:24] (Procesamiento) OK .ListaEESSPrecio presente y es array
+[2025-10-16 20:07:24] (Procesamiento) INFO Verificando .Fecha como string
+[2025-10-16 20:07:24] (Procesamiento) OK .Fecha presente
+[2025-10-16 20:07:24] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 20:07:24] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 20:07:24] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 20:07:24] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 20:07:24] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 20:07:24] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 20:07:24] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 20:07:24] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 20:07:24] (Informe) Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 20:07:24] (Informe) INFO Generando informe en txt
+[2025-10-16 20:07:24] (Informe) INFO Informe generado en: ./informes/informe_20251016-200723.txt
+[2025-10-16 20:22:20] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-202220
+[2025-10-16 20:22:20] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:22:20] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 20:22:21] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 20:22:21] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 20:22:21] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 20:22:21] (Procesamiento) OK JSON válido
+[2025-10-16 20:22:21] (Procesamiento) INFO Verificando .ListaEESSPrecio como array
+[2025-10-16 20:22:21] (Procesamiento) OK .ListaEESSPrecio presente y es array
+[2025-10-16 20:22:21] (Procesamiento) INFO Verificando .Fecha como string
+[2025-10-16 20:22:21] (Procesamiento) OK .Fecha presente
+[2025-10-16 20:22:21] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 20:22:21] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 20:22:22] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 20:22:22] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 20:22:22] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 20:22:22] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 20:22:22] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 20:22:22] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 20:22:22] (Informe) Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 20:22:22] (Informe) INFO Generando informe en txt
+[2025-10-16 20:22:22] (Informe) INFO Informe generado en: ./informes/informe_20251016-202220.txt
+[2025-10-16 20:22:22] (Finalizacion) INFO El programa se ha ejecutado correctamente
+[2025-10-16 20:23:55] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-202355
+[2025-10-16 20:23:55] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:23:55] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 20:23:56] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 20:23:56] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 20:23:56] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 20:23:56] (Procesamiento) OK JSON válido
+[2025-10-16 20:23:56] (Procesamiento) INFO Verificando .ListaEESSPrecio como array
+[2025-10-16 20:23:56] (Procesamiento) OK .ListaEESSPrecio presente y es array
+[2025-10-16 20:23:56] (Procesamiento) INFO Verificando .Fecha como string
+[2025-10-16 20:23:56] (Procesamiento) OK .Fecha presente
+[2025-10-16 20:23:56] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 20:23:56] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 20:23:56] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 20:23:56] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 20:23:56] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 20:23:56] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 20:23:56] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 20:23:56] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 20:23:56] (Informe) Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 20:23:56] (Informe) INFO Generando informe en txt
+[2025-10-16 20:23:56] (Informe) INFO Informe generado en: ./informes/informe_20251016-202355.txt
+[2025-10-16 20:23:56] (Finalizacion) INFO El programa se ha ejecutado correctamente
+[2025-10-16 20:26:18] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-202618
+[2025-10-16 20:26:18] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:26:18] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 20:26:18] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 20:26:18] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 20:26:18] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 20:26:18] (Procesamiento) OK JSON válido
+[2025-10-16 20:26:18] (Procesamiento) INFO Verificando .ListaEESSPrecio como array
+[2025-10-16 20:26:18] (Procesamiento) OK .ListaEESSPrecio presente y es array
+[2025-10-16 20:26:18] (Procesamiento) INFO Verificando .Fecha como string
+[2025-10-16 20:26:18] (Procesamiento) OK .Fecha presente
+[2025-10-16 20:26:18] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 20:26:18] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 20:26:18] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 20:26:18] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 20:26:18] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 20:26:18] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 20:26:18] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 20:26:18] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 20:26:19] (Informe) INFO Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 20:26:19] (Informe) INFO Generando informe en txt
+[2025-10-16 20:26:19] (Informe) OK Informe generado en: ./informes/informe_20251016-202618.txt
+[2025-10-16 20:26:19] (Finalizacion) INFO El programa se ha ejecutado correctamente
+[2025-10-16 20:27:32] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-202732
+[2025-10-16 20:27:32] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:27:32] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 20:27:33] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 20:27:33] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 20:27:33] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 20:27:33] (Procesamiento) OK JSON válido
+[2025-10-16 20:27:33] (Procesamiento) INFO Verificando ListaEESSPrecio como array
+[2025-10-16 20:27:33] (Procesamiento) OK ListaEESSPrecio presente y es array
+[2025-10-16 20:27:33] (Procesamiento) INFO Verificando Fecha como string
+[2025-10-16 20:27:33] (Procesamiento) OK Fecha presente
+[2025-10-16 20:27:33] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 20:27:33] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 20:27:33] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 20:27:33] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 20:27:33] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 20:27:33] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 20:27:33] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 20:27:33] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 20:27:33] (Informe) INFO Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 20:27:33] (Informe) INFO Generando informe en txt
+[2025-10-16 20:27:33] (Informe) OK Informe generado en: ./informes/informe_20251016-202732.txt
+[2025-10-16 20:27:33] (Finalizacion) INFO El programa se ha ejecutado correctamente
+[2025-10-16 20:27:54] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-202754
+[2025-10-16 20:27:54] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:27:54] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+curl: (6) Could not resolve host: sedeaplicaciones.minetur.gob.es
+[2025-10-16 20:27:54] (Descarga) ERROR Ha fallado la petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46. Error HTTP: 000
+[2025-10-16 20:27:54] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 20:27:54] (Procesamiento) ERROR la variable está vacia
+[2025-10-16 20:27:54] (Finalizacion) ERROR El programa terminó con código 1
+[2025-10-16 20:28:58] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-202858
+[2025-10-16 20:28:58] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 20:28:58] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+curl: (6) Could not resolve host: sedeaplicaciones.minetur.gob.es
+[2025-10-16 20:28:58] (Descarga) ERROR Ha fallado la petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46. Error HTTP: 000
+[2025-10-16 20:28:58] (Finalizacion) ERROR El programa terminó con código 1
