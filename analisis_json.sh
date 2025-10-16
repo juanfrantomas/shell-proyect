@@ -16,8 +16,8 @@ crear_carpetas() {
 }
 
 generar_informe_html() {
-  echo "Generando informe en html" >> "$NOMBRE_ARCHIVO_LOG"
-
+  echo "[$(date '+%F %T')] (Informe) INFO Generando informe en html" >> "$NOMBRE_ARCHIVO_LOG"
+  
   cat > "$NOMBRE_ARCHIVO_INFORME_HTML" <<EOF
     <!DOCTYPE html>
     <html lang="es">
