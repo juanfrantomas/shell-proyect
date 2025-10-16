@@ -333,3 +333,85 @@ curl: (6) Could not resolve host: sedeaplicaciones.minetur.gob.es
 curl: (6) Could not resolve host: sedeaplicaciones.minetur.gob.es
 [2025-10-16 20:28:58] (Descarga) ERROR Ha fallado la petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46. Error HTTP: 000
 [2025-10-16 20:28:58] (Finalizacion) ERROR El programa terminó con código 1
+Empieza el programa
+==================
+✔️ Carpeta ya existe: /home/wac/master/shell-proyect/datos
+✔️ Carpeta ya existe: /home/wac/master/shell-proyect/informes
+✔️ Carpeta ya existe: /home/wac/master/shell-proyect/planificacion
+[2025-10-16 21:01:20] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-210120
+[2025-10-16 21:01:20] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 21:01:20] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 21:01:20] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 21:01:20] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 21:01:21] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 21:01:21] (Procesamiento) OK JSON válido
+[2025-10-16 21:01:21] (Procesamiento) INFO Verificando ListaEESSPrecio como array
+[2025-10-16 21:01:21] (Procesamiento) OK ListaEESSPrecio presente y es array
+[2025-10-16 21:01:21] (Procesamiento) INFO Verificando Fecha como string
+[2025-10-16 21:01:21] (Procesamiento) OK Fecha presente
+[2025-10-16 21:01:21] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 21:01:21] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 21:01:21] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 21:01:21] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 21:01:21] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 21:01:21] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 21:01:21] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 21:01:21] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 21:01:21] (Informe) INFO Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 21:01:21] (Informe) INFO Generando informe en txt
+[2025-10-16 21:01:21] (Informe) OK Informe generado en: /home/wac/master/shell-proyect/informes/informe_20251016-210120.txt
+Generando informe en html
+[2025-10-16 21:01:21] (Finalizacion) INFO El programa se ha ejecutado correctamente
+Empieza el programa
+==================
+✔️ Carpeta ya existe: /home/wac/master/shell-proyect/datos
+✔️ Carpeta ya existe: /home/wac/master/shell-proyect/informes
+✔️ Carpeta ya existe: /home/wac/master/shell-proyect/planificacion
+[2025-10-16 21:18:35] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-211835
+[2025-10-16 21:18:35] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 21:18:35] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 21:18:36] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 21:18:36] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 21:18:36] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 21:18:36] (Procesamiento) OK JSON válido
+[2025-10-16 21:18:36] (Procesamiento) INFO Verificando ListaEESSPrecio como array
+[2025-10-16 21:18:36] (Procesamiento) OK ListaEESSPrecio presente y es array
+[2025-10-16 21:18:36] (Procesamiento) INFO Verificando Fecha como string
+[2025-10-16 21:18:36] (Procesamiento) OK Fecha presente
+[2025-10-16 21:18:36] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 21:18:36] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 21:18:36] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 21:18:37] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 21:18:37] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 21:18:37] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 21:18:37] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 21:18:37] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 21:18:37] (Informe) INFO Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 21:18:37] (Informe) INFO Generando informe en txt
+[2025-10-16 21:18:37] (Informe) OK Informe generado en: /home/wac/master/shell-proyect/informes/informe_20251016-211835.txt
+Generando informe en html
+[2025-10-16 21:18:37] (Finalizacion) INFO El programa se ha ejecutado correctamente
+[2025-10-16 21:20:45] (Inicio) INFO Identificador de la ejecución del CRON(FECHA)=20251016-212045
+[2025-10-16 21:20:45] (Descarga) INFO Petición de estaciones de la provincia de Valencia
+[2025-10-16 21:20:45] (Descarga) INFO Haciendo petición a https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46
+[2025-10-16 21:20:45] (Descarga) OK Petición Válida: Estado Petición HTTP = 200
+[2025-10-16 21:20:45] (Procesamiento) INFO Comprobando que la variable no este vacia
+[2025-10-16 21:20:46] (Procesamiento) INFO Comprobando que el JSON es válido
+[2025-10-16 21:20:46] (Procesamiento) OK JSON válido
+[2025-10-16 21:20:46] (Procesamiento) INFO Verificando ListaEESSPrecio como array
+[2025-10-16 21:20:46] (Procesamiento) OK ListaEESSPrecio presente y es array
+[2025-10-16 21:20:46] (Procesamiento) INFO Verificando Fecha como string
+[2025-10-16 21:20:46] (Procesamiento) OK Fecha presente
+[2025-10-16 21:20:46] (Procesamiento) INFO Procesando el JSON para extraer las variables necesarias
+[2025-10-16 21:20:46] (Procesamiento) Estaciones procesadas con éxito
+[2025-10-16 21:20:46] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95
+[2025-10-16 21:20:46] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel
+[2025-10-16 21:20:46] (Informe) INFO Calculando Top 5 Gasolina 95 por precio
+[2025-10-16 21:20:46] (Informe) OK Ranking Top 5 Gasolina 95 generado (registros=5)
+[2025-10-16 21:20:46] (Informe) INFO Calculando Top 5 Diésel por precio
+[2025-10-16 21:20:46] (Informe) OK Ranking Top 5 Diésel generado (registros=5)
+[2025-10-16 21:20:46] (Informe) INFO Carencia de datos: sin_G95=38 sin_Diesel=17 sin_Coords=0
+[2025-10-16 21:20:47] (Informe) INFO Generando informe en txt
+[2025-10-16 21:20:47] (Informe) OK Informe generado en: /home/wac/master/shell-proyect/informes/informe_20251016-212045.txt
+Generando informe en html
+[2025-10-16 21:20:47] (Finalizacion) INFO El programa se ha ejecutado correctamente

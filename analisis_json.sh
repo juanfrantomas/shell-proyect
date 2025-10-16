@@ -8,9 +8,9 @@ crear_carpetas() {
     path="$BASE_DIR/$dir"
     if [ ! -d "$path" ]; then
       mkdir -p "$path"
-      echo "📁 Carpeta creada: $path" | tee -a "$BASE_DIR/log.txt"
+      echo "[$(date '+%F %T')] (Inicio) INFO Creada carpeta: $path" >> $CRON_LOG_FILE
     else
-      echo "✔️ Carpeta ya existe: $path" | tee -a "$BASE_DIR/log.txt"
+      echo "[$(date '+%F %T')] (Inicio) INFO La carpeta ya existe: $path" >> $CRON_LOG_FILE
     fi
   done
 }
@@ -135,14 +135,16 @@ generar_informe_txt() {
   fi
 }
 
-echo "Empieza el programa" | tee -a "$BASE_DIR/log.txt"
-echo "==================" | tee -a "$BASE_DIR/log.txt"
+echo "Empieza el programa" >> "$BASE_DIR/log.txt"
+echo "==================" >> "$BASE_DIR/log.txt"
+
+# Identificador de ejecución: nos permite atar logs, salidas y futuros informes.
+RUN_ID="$(date +%Y%m%d-%H%M%S)"
+
+CRON_LOG_FILE="$BASE_DIR/cron.log"
 
 # Creacion de carpetas necesarios en caso de que no existan
 crear_carpetas
-
-# Identificador de ejecución: nos permite atar logs, salidas y futuros informes.(NACHO)
-RUN_ID="$(date +%Y%m%d-%H%M%S)"
 
 # Nombre de archivos que se van a guardar
 NOMBRE_ARCHIVO_VARIOS_LOG="$BASE_DIR/log_${RUN_ID}.txt"
@@ -155,7 +157,7 @@ NOMBRE_ARCHIVO_INFORME_HTML="$BASE_DIR/informes/informe_${RUN_ID}.html"
 
 # Variables extraidas
 FECHA_CRON="$(date '+%d/%m/%Y %H:%M:%S')"
-FECHAS_API=""
+FECHAS_API=$(echo "$getEstacionesValencia" | jq -r '.Fecha')
 
 TOP5_G95=""
 TOP5_DIESEL=""
@@ -246,9 +248,9 @@ echo "[$(date '+%F %T')] (Procesamiento) Estaciones procesadas con éxito" >> $N
 # ── Métricas Gasolina 95 ──────────────────────────────────────────────────────
 G95_COUNT=$(echo "$estaciones" | jq '[ .[] | .priceGasolina ] | map(select(.!=null)) | length' 2>>"$NOMBRE_ARCHIVO_LOG")
 if (( ${G95_COUNT:-0} > 0 )); then
-  G95_MIN=$(echo "$estaciones" | jq '[ .[] | .priceGasolina ] | map(select(.!=null)) | min' 2>>"$NOMBRE_ARCHIVO_LOG")
-  G95_MAX=$(echo "$estaciones" | jq '[ .[] | .priceGasolina ] | map(select(.!=null)) | max' 2>>"$NOMBRE_ARCHIVO_LOG")
-  G95_AVG=$(echo "$estaciones" | jq '[ .[] | .priceGasolina ] | map(select(.!=null)) | if length>0 then (add/length) else null end' 2>>"$NOMBRE_ARCHIVO_LOG")
+  G95_MIN=$(echo "$estaciones" | jq '[ .[] | .priceGasolina ] | map(select(.!=null)) | min  | (. * 1000 | round / 1000)' 2>>"$NOMBRE_ARCHIVO_LOG")
+  G95_MAX=$(echo "$estaciones" | jq '[ .[] | .priceGasolina ] | map(select(.!=null)) | max  | (. * 1000 | round / 1000)' 2>>"$NOMBRE_ARCHIVO_LOG")
+  G95_AVG=$(echo "$estaciones" | jq '[ .[] | .priceGasolina ] | map(select(.!=null)) | if length>0 then ((add/length) * 1000 | round / 1000) else null end' 2>>"$NOMBRE_ARCHIVO_LOG")
   echo "[$(date '+%F %T')] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Gasolina 95" >> "$NOMBRE_ARCHIVO_LOG"
 else
   G95_MIN=""; G95_MAX=""; G95_AVG=""
@@ -258,9 +260,9 @@ fi
 # ── Métricas Diésel ──────────────────────────────────────────────────────────
 DIESEL_COUNT=$(echo "$estaciones" | jq '[ .[] | .priceDiesel ] | map(select(.!=null)) | length' 2>>"$NOMBRE_ARCHIVO_LOG")
 if (( ${DIESEL_COUNT:-0} > 0 )); then
-  DIESEL_MIN=$(echo "$estaciones" | jq '[ .[] | .priceDiesel ] | map(select(.!=null)) | min' 2>>"$NOMBRE_ARCHIVO_LOG")
-  DIESEL_MAX=$(echo "$estaciones" | jq '[ .[] | .priceDiesel ] | map(select(.!=null)) | max' 2>>"$NOMBRE_ARCHIVO_LOG")
-  DIESEL_AVG=$(echo "$estaciones" | jq '[ .[] | .priceDiesel ] | map(select(.!=null)) | if length>0 then (add/length) else null end' 2>>"$NOMBRE_ARCHIVO_LOG")
+  DIESEL_MIN=$(echo "$estaciones" | jq '[ .[] | .priceDiesel ] | map(select(.!=null)) | min | (. * 1000 | round / 1000)' 2>>"$NOMBRE_ARCHIVO_LOG")
+  DIESEL_MAX=$(echo "$estaciones" | jq '[ .[] | .priceDiesel ] | map(select(.!=null)) | max | (. * 1000 | round / 1000)' 2>>"$NOMBRE_ARCHIVO_LOG")
+  DIESEL_AVG=$(echo "$estaciones" | jq '[ .[] | .priceDiesel ] | map(select(.!=null)) | if length>0 then ((add/length) * 1000 | round / 1000) else null end' 2>>"$NOMBRE_ARCHIVO_LOG")
   echo "[$(date '+%F %T')] (Informe) OK Estadísticos descriptivos (mínimo, media, máximo) obtenidos para Diésel" >> "$NOMBRE_ARCHIVO_LOG"
 else
   DIESEL_MIN=""; DIESEL_MAX=""; DIESEL_AVG=""
