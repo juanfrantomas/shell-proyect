@@ -45,7 +45,7 @@ generar_informe_html() {
     <body>
       <h1>Informe de Gasolineras de Valencia</h1>
       <p>🕒 Fecha del cron: $FECHA_CRON</p>
-      <p>📅 Fechas de la API: $FECHAS_API</p>
+      <p>📅 Fechas de la API: $FECHA_API</p>
 
       <div class="section">
         <h2>🚗 GASOLINA 95</h2>
@@ -94,7 +94,7 @@ generar_informe_txt() {
       echo "=============================================="
       echo ""
       echo "🕒 Fecha del cron:        $FECHA_CRON"
-      echo "📅 Fechas de la API:      $FECHAS_API"
+      echo "📅 Fechas de la API:      $FECHA_API"
       echo ""
       echo "----------------------------------------------"
       echo "🚗 GASOLINA 95"
@@ -157,7 +157,6 @@ NOMBRE_ARCHIVO_INFORME_HTML="$BASE_DIR/informes/informe_${RUN_ID}.html"
 
 # Variables extraidas
 FECHA_CRON="$(date '+%d/%m/%Y %H:%M:%S')"
-FECHAS_API=$(echo "$getEstacionesValencia" | jq -r '.Fecha')
 
 TOP5_G95=""
 TOP5_DIESEL=""
@@ -201,6 +200,8 @@ else
   echo "[$(date '+%F %T')] (Descarga) ERROR Ha fallado la petición a $urlValencia. Error HTTP: $status" >> $NOMBRE_ARCHIVO_LOG
   exit 1
 fi
+
+FECHA_API="$(echo "$getEstacionesValencia" | jq -r '.Fecha')"
 
 # Procesar JSON con jq: extraer Dirección por cada estación
 

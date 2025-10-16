@@ -1,0 +1,1 @@
+0 * * * * /usr/bin/env bash /home/juanfrandeveloper/master/shell-proyect/analisis_json.sh >> /home/juanfrandeveloper/master/shell-proyect/cron.log 2>&1
