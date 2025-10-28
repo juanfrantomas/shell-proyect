@@ -1,0 +1,53 @@
+% Configuración de formato del documento
+
+% Interlineado
+\onehalfspacing
+
+% Configuración de encabezados y pies de página
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\leftmark}
+\fancyhead[LO]{\rightmark}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Estilo de capítulos y secciones
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{40pt}
+
+% Configuración de listings para código
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  captionpos=b,
+  commentstyle=\color{green!50!black},
+  keywordstyle=\color{blue},
+  stringstyle=\color{orange},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=8pt,
+  showstringspaces=false,
+  tabsize=2,
+  frame=single,
+  rulecolor=\color{black!30},
+  backgroundcolor=\color{gray!5}
+}
+
+% Definir estilo para Bash
+\lstdefinestyle{bash}{
+  language=bash,
+  morekeywords={echo,if,then,else,fi,for,in,do,done,while,read,cat,grep,sed,awk,curl,jq}
+}
+
+% Ruta de imágenes
+\graphicspath{{imagenes/}}
+
+% Formato de títulos de figuras y tablas
+\captionsetup{
+  font=small,
+  labelfont=bf,
+  format=hang,
+  justification=justified
+}

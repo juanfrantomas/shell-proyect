@@ -1,0 +1,38 @@
+\chapter{Objetivos}
+
+\section{Objetivo general}
+
+Desarrollar un sistema automatizado que permita el análisis periódico de los precios de combustibles en las estaciones de servicio de Valencia, generando informes informativos que faciliten la toma de decisiones de los usuarios.
+
+\section{Objetivos específicos}
+
+\begin{objetivos}
+  \item Implementar un mecanismo de obtención de datos desde la API pública del Ministerio
+  \item Diseñar un proceso de transformación y limpieza de datos JSON
+  \item Calcular estadísticas relevantes (precios mínimos, máximos y medios)
+  \item Generar rankings de las estaciones más económicas
+  \item Producir informes en formato HTML y texto plano
+  \item Automatizar la ejecución mediante tareas programadas (cron)
+  \item Implementar control de errores y registro de logs
+  \item Optimizar el rendimiento mediante caché local
+\end{objetivos}
+
+\section{Alcance del proyecto}
+
+El proyecto se centra en:
+
+\begin{itemize}
+  \item Análisis de datos de la provincia de Valencia (código 46)
+  \item Tipos de combustible: Gasolina 95 y Diésel
+  \item Generación de informes estáticos (HTML y TXT)
+  \item Ejecución en sistemas Linux/Unix con Bash
+\end{itemize}
+
+\section{Limitaciones}
+
+\begin{itemize}
+  \item No incluye interfaz web interactiva
+  \item Depende de la disponibilidad de la API gubernamental
+  \item Requiere herramientas externas: \code{curl} y \code{jq}
+  \item No implementa historial de precios a largo plazo
+\end{itemize}

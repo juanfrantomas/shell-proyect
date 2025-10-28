@@ -1,0 +1,143 @@
+\chapter{Implementación}
+
+\section{Tecnologías utilizadas}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    \textbf{Herramienta} & \textbf{Versión/Propósito} \\ \midrule
+    Bash                 & 5.x - Shell scripting      \\
+    curl                 & 7.x - Peticiones HTTP      \\
+    jq                   & 1.6+ - Procesamiento JSON  \\
+    cron                 & - Automatización           \\
+    Git                  & Control de versiones       \\ \bottomrule
+  \end{tabular}
+  \caption{Stack tecnológico}
+  \label{tab:stack}
+\end{table}
+
+\section{Detalles de implementación}
+
+\subsection{Obtención de datos}
+
+\begin{lstlisting}[style=bash,caption={Petición HTTP con curl}]
+status=$(curl -sS -H "Accept: application/json" \
+  -o "$NOMBRE_ARCHIVO_GUARDAR_ESTACIONES" \
+  -w '%{http_code}' "$urlValencia" \
+  2>> $NOMBRE_ARCHIVO_LOG)
+
+if [ "$status" -ge 200 ] && [ "$status" -lt 300 ]; then
+  echo "Peticion OK: Estado $status" | tee -a "$NOMBRE_ARCHIVO_LOG"
+  getEstacionesValencia=$(cat "$NOMBRE_ARCHIVO_GUARDAR_ESTACIONES")
+else
+  echo "Error HTTP: $status" | tee -a "$NOMBRE_ARCHIVO_LOG"
+fi
+\end{lstlisting}
+
+\subsection{Procesamiento con jq}
+
+Transformación del JSON bruto a estructura simplificada:
+
+\begin{lstlisting}[style=bash,caption={Transformación JSON}]
+estaciones=$(echo "$getEstacionesValencia" | jq '[
+  .ListaEESSPrecio[]
+  | {
+      id: (.IDEESS | tonumber?),
+      name: .["Rotulo"],
+      lat: ( (.Latitud // "") | gsub(",";".") 
+           | (if . == "" then null else tonumber end) ),
+      lon: ( (.["Longitud (WGS84)"] // "") | gsub(",";".") 
+           | (if . == "" then null else tonumber end) ),
+      addr: ( [ .["Direccion"], .["Localidad"], .["Provincia"] ] 
+            | map(select(. != null and . != "")) 
+            | join(", ") ),
+      priceDiesel: ( (.["Precio Gasoleo A"] // "") | gsub(",";".") 
+                   | (if . == "" then null else tonumber end) ),
+      priceGasolina: ( ( .["Precio Gasolina 95 E5"]
+                       // .["Precio Gasolina 95 E10"]
+                       // .["Precio Gasolina 95 E5 Premium"]
+                       // "" )
+                       | gsub(",";".") 
+                       | (if . == "" then null else tonumber end) )
+    }
+]')
+\end{lstlisting}
+
+\subsection{Cálculo de estadísticas}
+
+\begin{lstlisting}[style=bash,caption={Estadísticas de precios}]
+# Metricas gasolina con redondeo a 3 decimales
+G95_MIN=$(echo "$estaciones" | jq '
+  [ .[] | .priceGasolina ] 
+  | map(select(.!=null)) 
+  | min 
+  | (. * 1000 | round / 1000)
+')
+
+G95_AVG=$(echo "$estaciones" | jq '
+  [ .[] | .priceGasolina ] 
+  | map(select(.!=null)) 
+  | if length>0 then 
+      ((add/length) * 1000 | round / 1000) 
+    else null 
+    end
+')
+\end{lstlisting}
+
+\subsection{Generación de rankings}
+
+\begin{lstlisting}[style=bash,caption={Top 5 más baratas}]
+TOP5_G95=$(echo "$estaciones" | jq '
+  [ .[] | select(.priceGasolina!=null) 
+    | { id, name, addr, lat, lon, priceGasolina } 
+  ] 
+  | sort_by(.priceGasolina) 
+  | .[0:5]
+')
+\end{lstlisting}
+
+\section{Generación de informes HTML}
+
+El informe HTML incluye:
+
+\begin{itemize}
+  \item CSS embebido con gradientes y sombras
+  \item Tablas responsivas con hover effects
+  \item Colores dinámicos basados en precio medio
+  \item Estructura semántica (sections, headers, footer)
+\end{itemize}
+
+\subsection{Coloración dinámica de precios}
+
+\begin{lstlisting}[style=bash,caption={Asignación de clases CSS}]
+jq --arg avg "$G95_AVG" -r '
+  .[] | "<tr><td>\(.id)</td><td>\(.name)</td>
+         <td>\(.addr)</td><td>\(.lat)</td><td>\(.lon)</td>
+         <td class='"'"'price " + 
+         (if .priceGasolina < ($avg | tonumber) then "low" 
+          elif .priceGasolina > ($avg | tonumber) then "high" 
+          else "avg" end) + "'"'"'>
+         \((.priceGasolina * 1000 | round / 1000))
+         </td></tr>"
+'
+\end{lstlisting}
+
+\section{Automatización con cron}
+
+Ejemplo de entrada crontab para ejecución diaria:
+
+\begin{lstlisting}[style=bash]
+# Ejecutar a las 8:00 AM todos los dias
+0 8 * * * /home/usuario/shell-proyect/analisis_json.sh
+\end{lstlisting}
+
+\section{Control de versiones}
+
+Se utiliza Git para el control de versiones con la siguiente estructura de ramas:
+
+\begin{itemize}
+  \item \code{main}: Rama principal estable
+  \item \code{feat/informe-html}: Desarrollo de informes HTML
+  \item \code{feat/*}: Nuevas funcionalidades
+\end{itemize}

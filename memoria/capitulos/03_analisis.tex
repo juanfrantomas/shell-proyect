@@ -1,0 +1,100 @@
+\chapter{Análisis del problema}
+
+\section{Fuente de datos}
+
+\subsection{API del Ministerio}
+
+El Ministerio para la Transición Ecológica proporciona una API REST pública con información actualizada de todas las estaciones de servicio de España.
+
+\begin{itemize}
+  \item \textbf{URL base}: \url{https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/}
+  \item \textbf{Endpoint utilizado}: \code{PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/46}
+  \item \textbf{Formato}: JSON
+  \item \textbf{Frecuencia de actualización}: Diaria
+\end{itemize}
+
+\subsection{Estructura de datos}
+
+La respuesta JSON contiene:
+
+\begin{lstlisting}[language=json,caption={Estructura de la respuesta JSON}]
+{
+  "Fecha": "11/10/2025 19:00:00",
+  "ListaEESSPrecio": [
+    {
+      "IDEESS": "12345",
+      "Rotulo": "NOMBRE ESTACION",
+      "Direccion": "CALLE EJEMPLO 123",
+      "Localidad": "VALENCIA",
+      "Provincia": "VALENCIA",
+      "Latitud": "39,4699",
+      "Longitud (WGS84)": "-0,3763",
+      "Precio Gasolina 95 E5": "1,549",
+      "Precio Gasoleo A": "1,389"
+    }
+  ]
+}
+\end{lstlisting}
+
+\section{Tecnologías evaluadas}
+
+\subsection{Shell scripting (Bash)}
+
+\textbf{Ventajas:}
+\begin{itemize}
+  \item Nativo en sistemas Linux
+  \item Excelente integración con herramientas del sistema
+  \item Bajo overhead y alta eficiencia
+  \item Ideal para automatización con cron
+\end{itemize}
+
+\textbf{Desventajas:}
+\begin{itemize}
+  \item Sintaxis compleja para operaciones avanzadas
+  \item Limitado en manipulación de estructuras de datos
+\end{itemize}
+
+\subsection{Python}
+
+\textbf{Ventajas:}
+\begin{itemize}
+  \item Librerías robustas (requests, pandas, jinja2)
+  \item Sintaxis clara y legible
+  \item Mejor manejo de estructuras complejas
+\end{itemize}
+
+\textbf{Desventajas:}
+\begin{itemize}
+  \item Requiere instalación de dependencias
+  \item Mayor consumo de recursos
+\end{itemize}
+
+\subsection{Decisión}
+
+Se optó por \textbf{Bash + jq} por:
+\begin{itemize}
+  \item Mínimas dependencias (solo curl y jq)
+  \item Integración nativa con el sistema
+  \item Eficiencia en el procesamiento de texto
+  \item Simplicidad de despliegue
+\end{itemize}
+
+\section{Requisitos funcionales}
+
+\begin{enumerate}
+  \item El sistema debe obtener datos actualizados de la API
+  \item Debe validar la estructura del JSON recibido
+  \item Debe calcular estadísticas de precios
+  \item Debe generar rankings ordenados
+  \item Debe producir informes en HTML y TXT
+  \item Debe registrar todas las operaciones en logs
+\end{enumerate}
+
+\section{Requisitos no funcionales}
+
+\begin{itemize}
+  \item \textbf{Rendimiento}: Tiempo de ejecución < 30 segundos
+  \item \textbf{Fiabilidad}: Control de errores en peticiones HTTP
+  \item \textbf{Mantenibilidad}: Código documentado y modular
+  \item \textbf{Portabilidad}: Compatible con distribuciones Linux estándar
+\end{itemize}

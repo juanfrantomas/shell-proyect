@@ -1,0 +1,147 @@
+\chapter{Código fuente}
+
+\section{Script principal}
+
+El código completo del script \code{analisis\_json.sh} se encuentra en el repositorio del proyecto:
+
+\url{https://github.com/juanfrantomas/shell-proyect}
+
+\section{Fragmentos destacados}
+
+\subsection{Función de validación JSON}
+
+\begin{lstlisting}[style=bash,caption={Validación de estructura JSON}]
+echo "Comprobando que la variable no este vacia" \
+  >> $NOMBRE_ARCHIVO_LOG
+if [ -z "$getEstacionesValencia" ]; then
+  echo "getEstacionesValencia vacio. Termino." \
+    >> $NOMBRE_ARCHIVO_LOG
+  exit 1
+fi
+
+echo "Comprobando que el JSON es valido" \
+  >> $NOMBRE_ARCHIVO_LOG
+echo "$getEstacionesValencia" | jq empty > /dev/null \
+  2>>$NOMBRE_ARCHIVO_LOG \
+  || { echo "JSON invalido" >> $NOMBRE_ARCHIVO_LOG; exit 1; }
+
+echo "Comprobando que existe la lista de estaciones" \
+  >> $NOMBRE_ARCHIVO_LOG
+echo "$getEstacionesValencia" \
+  | jq -e '.ListaEESSPrecio | type=="array"' \
+  >/dev/null 2>>$NOMBRE_ARCHIVO_LOG \
+  || { echo "Falta .ListaEESSPrecio[]" \
+       >> $NOMBRE_ARCHIVO_LOG; exit 1; }
+\end{lstlisting}
+
+\subsection{Generación de tabla HTML}
+
+\begin{lstlisting}[style=bash,caption={Tabla HTML dinámica con colores}]
+<table>
+  <tr>
+    <th>ID</th><th>Nombre</th><th>Direccion</th>
+    <th>Latitud</th><th>Longitud</th>
+    <th>Precio Gasolina (EUR)</th>
+  </tr>
+$(echo "$TOP5_G95" | jq --arg avg "$G95_AVG" -r '
+  .[] | "<tr><td>\(.id)</td><td>\(.name)</td>
+         <td>\(.addr)</td><td>\(.lat)</td><td>\(.lon)</td>
+         <td class='"'"'price " + 
+           (if .priceGasolina < ($avg | tonumber) 
+            then "low" 
+            elif .priceGasolina > ($avg | tonumber) 
+            then "high" 
+            else "avg" end) + "'"'"'>
+         \((.priceGasolina * 1000 | round / 1000))
+         </td></tr>"
+')
+</table>
+\end{lstlisting}
+
+\subsection{Configuración BASE\_DIR}
+
+\begin{lstlisting}[style=bash,caption={Rutas absolutas con BASE\_DIR}]
+#!/usr/bin/env bash
+
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Funciones necesarias
+crear_carpetas() {
+  for dir in datos informes planificacion; do
+    path="$BASE_DIR/$dir"
+    if [ ! -d "$path" ]; then
+      mkdir -p "$path"
+      echo "Carpeta creada: $path" | tee -a "$BASE_DIR/log.txt"
+    else
+      echo "Carpeta ya existe: $path" | tee -a "$BASE_DIR/log.txt"
+    fi
+  done
+}
+\end{lstlisting}
+
+\section{Estructura del proyecto}
+
+\begin{lstlisting}[style=bash]
+shell-proyect/
+├── analisis_json.sh          # Script principal
+├── README.md                  # Documentacion
+├── log.txt                    # Log principal
+├── datos/                     # JSON descargados
+│   ├── estacionesValencia_20251011-190935.json
+│   └── ...
+├── informes/                  # Informes generados
+│   ├── informe_20251011-190935.html
+│   ├── informe_20251011-190935.txt
+│   └── ...
+├── planificacion/             # Documentos de planificacion
+└── memoria/                   # Esta memoria
+    ├── main.tex
+    ├── capitulos/
+    ├── config/
+    ├── imagenes/
+    └── apendices/
+\end{lstlisting}
+
+\section{Comandos útiles}
+
+\subsection{Ejecución manual}
+
+\begin{lstlisting}[style=bash]
+# Dar permisos de ejecucion
+chmod +x analisis_json.sh
+
+# Ejecutar el script
+./analisis_json.sh
+
+# Ver el log
+tail -f log.txt
+
+# Abrir ultimo informe HTML generado
+xdg-open informes/informe_$(ls -t informes/ | head -1)
+\end{lstlisting}
+
+\subsection{Configuración de cron}
+
+\begin{lstlisting}[style=bash]
+# Editar crontab
+crontab -e
+
+# Añadir linea (ejecutar diariamente a las 8:00 AM)
+0 8 * * * /ruta/completa/analisis_json.sh
+
+# Ver tareas programadas
+crontab -l
+\end{lstlisting}
+
+\subsection{Análisis de logs}
+
+\begin{lstlisting}[style=bash]
+# Ver errores
+grep -i "error" log.txt
+
+# Contar ejecuciones
+grep -c "Empieza el programa" log.txt
+
+# Ver ultimas estadisticas
+grep "stats" log.txt | tail -5
+\end{lstlisting}

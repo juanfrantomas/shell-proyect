@@ -1,0 +1,97 @@
+\chapter{Diseño de la solución}
+
+\section{Arquitectura del sistema}
+
+El sistema sigue una arquitectura de flujo de datos en pipeline:
+
+\begin{enumerate}
+  \item \textbf{Obtención}: Petición HTTP a la API
+  \item \textbf{Almacenamiento}: Guardado del JSON bruto
+  \item \textbf{Validación}: Comprobación de estructura y contenido
+  \item \textbf{Transformación}: Procesamiento con jq
+  \item \textbf{Análisis}: Cálculo de estadísticas
+  \item \textbf{Generación}: Creación de informes
+  \item \textbf{Registro}: Logging de operaciones
+\end{enumerate}
+
+\section{Componentes principales}
+
+\subsection{Script principal: \code{analisis\_json.sh}}
+
+Orquesta todo el proceso y contiene la lógica principal.
+
+\textbf{Variables de configuración:}
+\begin{itemize}
+  \item \code{BASE\_DIR}: Directorio raíz del proyecto
+  \item \code{urlValencia}: URL de la API
+  \item \code{RUN\_ID}: Identificador único de ejecución
+\end{itemize}
+
+\subsection{Estructura de directorios}
+
+\begin{lstlisting}[style=bash]
+shell-proyect/
+├── analisis_json.sh
+├── datos/
+│   └── estacionesValencia_YYYYMMDD-HHMMSS.json
+├── informes/
+│   ├── informe_YYYYMMDD-HHMMSS.html
+│   └── informe_YYYYMMDD-HHMMSS.txt
+├── planificacion/
+└── log.txt
+\end{lstlisting}
+
+\section{Funciones principales}
+
+\subsection{\code{crear\_carpetas()}}
+
+Crea la estructura de directorios necesaria si no existe.
+
+\subsection{\code{generar\_informe\_html()}}
+
+Genera un informe visual en HTML con:
+\begin{itemize}
+  \item Estadísticas de precios
+  \item Tablas con Top 5 estaciones más baratas
+  \item Código de colores (verde: barato, rojo: caro)
+  \item Diseño responsivo
+\end{itemize}
+
+\subsection{\code{generar\_informe\_txt()}}
+
+Genera un informe en texto plano para consulta rápida en terminal.
+
+\section{Flujo de datos}
+
+\begin{figure}[H]
+  \centering
+  \begin{verbatim}
+  API ─> curl ─> JSON bruto ─> jq ─> JSON procesado
+                                         │
+                                         ├─> Estadísticas
+                                         ├─> Rankings
+                                         └─> Informes (HTML/TXT)
+  \end{verbatim}
+  \caption{Flujo de procesamiento de datos}
+  \label{fig:flujo}
+\end{figure}
+
+\section{Manejo de errores}
+
+\subsection{Validación de entrada}
+\begin{itemize}
+  \item Comprobación de código HTTP (200-299)
+  \item Validación de JSON con \code{jq empty}
+  \item Verificación de campos obligatorios
+\end{itemize}
+
+\subsection{Registro de errores}
+Todos los errores se registran en \code{log.txt} con timestamp y contexto.
+
+\section{Optimizaciones}
+
+\subsection{Caché local}
+Se guarda cada respuesta JSON para permitir análisis offline sin nuevas peticiones.
+
+\subsection{Rutas absolutas}
+Uso de \code{BASE\_DIR} para independencia del directorio de trabajo actual.

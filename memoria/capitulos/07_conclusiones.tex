@@ -1,0 +1,106 @@
+\chapter{Conclusiones y trabajo futuro}
+
+\section{Conclusiones}
+
+\subsection{Logros principales}
+
+El proyecto ha conseguido desarrollar con éxito un sistema automatizado para el análisis de precios de combustibles que cumple todos los objetivos planteados:
+
+\begin{enumerate}
+  \item \textbf{Automatización completa}: El sistema funciona de forma autónoma mediante cron
+  \item \textbf{Procesamiento eficiente}: Maneja grandes volúmenes de datos JSON con excelente rendimiento
+  \item \textbf{Informes de calidad}: Genera reportes visuales y textuales informativos
+  \item \textbf{Robustez}: Implementa validación de datos y manejo de errores
+  \item \textbf{Mantenibilidad}: Código modular, documentado y versionado
+\end{enumerate}
+
+\subsection{Aprendizajes}
+
+Durante el desarrollo del proyecto se han adquirido conocimientos en:
+
+\begin{itemize}
+  \item Programación avanzada en Bash
+  \item Manipulación de datos JSON con jq
+  \item Integración con APIs REST públicas
+  \item Generación de contenido HTML dinámico
+  \item Automatización de tareas con cron
+  \item Buenas prácticas en shell scripting
+\end{itemize}
+
+\subsection{Ventajas de la solución}
+
+\begin{itemize}
+  \item \textbf{Ligereza}: Sin dependencias pesadas (Python, Node.js)
+  \item \textbf{Portabilidad}: Compatible con cualquier sistema Linux/Unix
+  \item \textbf{Eficiencia}: Bajo consumo de recursos
+  \item \textbf{Integración}: Fácil incorporación en pipelines existentes
+  \item \textbf{Transparencia}: Datos procesados guardados para auditoría
+\end{itemize}
+
+\subsection{Limitaciones identificadas}
+
+\begin{itemize}
+  \item No hay interfaz web interactiva
+  \item Falta análisis histórico de tendencias
+  \item Sin notificaciones a usuarios
+  \item Limitado a una provincia
+\end{itemize}
+
+\section{Trabajo futuro}
+
+\subsection{Mejoras a corto plazo}
+
+\begin{enumerate}
+  \item \textbf{Base de datos histórica}: Almacenar precios en SQLite para análisis temporal
+
+  \item \textbf{Gráficas de tendencias}: Generar gráficos con gnuplot o matplotlib
+
+  \item \textbf{Notificaciones}: Enviar alertas por email cuando los precios bajen
+
+  \item \textbf{Múltiples provincias}: Extender el análisis a toda España
+
+  \item \textbf{Más estadísticas}: Desviación estándar, percentiles, correlaciones geográficas
+\end{enumerate}
+
+\subsection{Mejoras a medio plazo}
+
+\begin{enumerate}
+  \item \textbf{API propia}: Exponer datos procesados mediante API REST
+
+  \item \textbf{Interfaz web}: Dashboard interactivo con mapa de estaciones
+
+  \item \textbf{App móvil}: Cliente móvil para consulta sobre la marcha
+
+  \item \textbf{Geolocalización}: Encontrar estaciones más cercanas y baratas
+
+  \item \textbf{Machine Learning}: Predecir tendencias de precios
+\end{enumerate}
+
+\subsection{Mejoras técnicas}
+
+\begin{itemize}
+  \item Implementar \code{set -euo pipefail} para mayor robustez
+  \item Añadir lockfile para evitar ejecuciones concurrentes
+  \item Escrituras atómicas con \code{mktemp}
+  \item Retries con backoff exponencial en peticiones HTTP
+  \item Tests automatizados con Bats
+  \item Integración continua con GitHub Actions
+  \item Linting con shellcheck
+\end{itemize}
+
+\section{Aplicabilidad}
+
+El enfoque desarrollado es aplicable a otros dominios:
+
+\begin{itemize}
+  \item Análisis de precios de electricidad
+  \item Monitorización de datos meteorológicos
+  \item Seguimiento de indicadores económicos
+  \item Agregación de datos de transporte público
+\end{itemize}
+
+\section{Reflexión final}
+
+Este proyecto demuestra que es posible crear herramientas útiles y eficientes utilizando tecnologías simples y bien establecidas. La combinación de Bash, jq y herramientas Unix estándar ofrece una alternativa potente y minimalista a soluciones más complejas, siendo especialmente adecuada para entornos de servidor y automatización.
+
+La experiencia adquirida en el desarrollo de este sistema es directamente transferible al ámbito profesional, donde la automatización, el procesamiento de datos y la generación de informes son tareas cotidianas.

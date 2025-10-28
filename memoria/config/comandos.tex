@@ -1,0 +1,27 @@
+% Comandos personalizados
+
+% Comando para nombre del proyecto
+\newcommand{\nombreproyecto}{Análisis de Precios de Gasolineras}
+
+% Comando para incluir código bash desde archivo
+\newcommand{\codigobash}[2]{
+  \lstinputlisting[style=bash,caption={#2},label={lst:#1}]{../#1}
+}
+
+% Comando para citas de código inline
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Comando para URLs mejor formateadas
+\newcommand{\enlace}[2]{\href{#1}{\texttt{#2}}}
+
+% Entorno para objetivos
+\newenvironment{objetivos}
+{\begin{itemize}[label=\textbullet]}
+    {\end{itemize}}
+
+% Comando para notas importantes
+\newcommand{\nota}[1]{
+  \begin{center}
+    \fbox{\parbox{0.9\textwidth}{\textbf{Nota:} #1}}
+  \end{center}
+}
