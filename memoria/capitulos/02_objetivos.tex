@@ -1,13 +1,47 @@
-\chapter{FUENTE DE DATOS Y DESCARGA}
+\chapter{FUENTE DE DATOS}
 
-El sistema se apoya en datos públicos de precios de estaciones de servicio para la provincia de Valencia, servidos en JSON mediante un endpoint estable y accesible sin autenticación. Esto es clave por dos razones. Primero, permite ejecución desatendida: al no depender de formularios ni tokens, la petición se integra sin fricción en una tarea programada. Segundo, el formato JSON facilita la verificación estructural y la extracción precisa de campos antes de cualquier tratamiento, de modo que lo que llega al informe está respaldado por un documento coherente.
+El sistema se apoya en datos públicos de precios de estaciones de servicio para Valencia, servidos en JSON mediante endpoint estable y accesible sin autenticación. Esto permite: (1) ejecución desatendida sin dependencia de formularios ni tokens, integración directa en cron; (2) formato JSON facilita verificación estructural y extracción precisa de campos antes de cualquier tratamiento.
 
-La obtención se realiza con una petición HTTP idempotente mediante \texttt{curl} en modo silencioso, adecuada para cron. Se fija la cabecera \texttt{Accept: application/json} para evitar ambigüedades en la negociación de contenido, se vuelca la respuesta a fichero y se captura el código de estado HTTP en la variable \texttt{status} con \texttt{-w '\%\{http\_code\}'}. Con esa señal decidimos si proseguir o abortar antes de tocar el JSON: solo continuamos ante un 2xx. En caso contrario, el script corta la ejecución y deja un mensaje claro en el log. Filosofía: ``fallar pronto y con diagnóstico comprensible'', porque no hay un operador mirando la consola.
+\begin{figure}[H]
+  \centering
+  \footnotesize
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Elemento} & \textbf{Detalle}                          \\
+    \midrule
+    Formato           & JSON                                      \\
+    Método            & HTTP GET con curl                         \\
+    Autenticación     & No requiere                               \\
+    Frecuencia        & Actualización diaria                      \\
+    Campos clave      & Precio G95/Diésel, coordenadas, dirección \\
+    \bottomrule
+  \end{tabular}
+  \caption{Características de la fuente de datos}
+\end{figure}
 
-El fichero se guarda con un identificador temporal (\texttt{RUN\_ID}) en el nombre. No es un detalle estético: asegura la trazabilidad de extremo a extremo. Una ejecución concreta (por ejemplo, 24/10/2025 a las 08:00) deja, bajo ese \texttt{RUN\_ID}, el JSON original, los informes en TXT y HTML y las entradas correspondientes en el log. Si más tarde surge una duda o una anomalía, es posible reconstruir qué datos se usaron y qué cálculo se hizo sin mezclar artefactos de distintos días.
+La obtención se realiza con petición HTTP idempotente mediante \texttt{curl} en modo silencioso, adecuada para cron. Se fija cabecera \texttt{Accept: application/json}, se vuelca respuesta a fichero y se captura código HTTP en variable \texttt{status} con \texttt{-w '\%\{http\_code\}'}. Con esa señal decidimos si proseguir o abortar: solo continuamos ante 2xx. Filosofía: ``fallar pronto y con diagnóstico comprensible''.
 
-La fuente incluye, además, una marca temporal propia (\texttt{Fecha}) que recoge el momento de actualización oficial del dataset. Por eso el sistema maneja dos referencias temporales complementarias: la fecha y hora de ejecución (cuando corre el cron, ver Punto 3) y la fecha de la API (cuándo se actualizaron los datos en el proveedor). En los informes se muestran ambas para que el lector entienda si está viendo resultados de hoy y de qué actualización proceden.
+\begin{figure}[H]
+  \footnotesize
+  \begin{lstlisting}[language=bash]
+# Descarga con curl y captura de codigo HTTP
+status=$(curl -s -w '%{http_code}' -o "$ARCHIVO_JSON" \
+  -H "Accept: application/json" "$URL_API")
 
-Un aspecto práctico del dataset: muchos campos numéricos (por ejemplo, precios) vienen con coma decimal. No afecta a la descarga, pero sí al uso. Si no se normaliza a punto decimal y no se tipa a número, cálculos como medias, mínimos u ordenaciones fallan o arrojan resultados inconsistentes. Este punto se resuelve en el Punto 4 (Proceso y validaciones) con normalización y tipado mediante \texttt{jq}. La planificación que da la cadencia adecuada y gestiona redirecciones de salida/errores se detalla en el Punto 3 (Arquitectura y automatización).
+if [ "$status" -ge 200 ] && [ "$status" -lt 300 ]; then
+  echo "[...] (Descarga) OK HTTP=$status"
+else
+  echo "[...] (Descarga) ERROR HTTP=$status"
+  exit 1
+fi
+\end{lstlisting}
+  \caption{Descarga y validación HTTP}
+\end{figure}
 
-Con la fuente y la mecánica de obtención definidas, falta encajar su lugar en el proyecto y su repetición diaria. Para que cada descarga termine en el directorio correcto, conserve su \texttt{RUN\_ID} y deje un rastro auditable, la ejecución no puede depender de acciones manuales ni de variables de entorno cambiantes. El siguiente apartado define la arquitectura mínima (árbol de carpetas y nombres de ficheros) y la automatización que la hace operativa (planificación, rutas absolutas y redirección de salidas). Sobre esa base estable se apoyarán las validaciones y los informes.
+El fichero se guarda con identificador temporal (\texttt{RUN\_ID}) en el nombre, asegurando trazabilidad de extremo a extremo. Una ejecución concreta deja, bajo ese \texttt{RUN\_ID}, el JSON original, informes en TXT y HTML y entradas en el log. Si surge duda o anomalía, es posible reconstruir qué datos se usaron y qué cálculo se hizo.
+
+La fuente incluye marca temporal propia (\texttt{Fecha}) del momento de actualización oficial. El sistema maneja dos referencias complementarias: fecha/hora de ejecución (cuando corre cron) y fecha API (cuándo se actualizaron datos en proveedor). En informes se muestran ambas para claridad.
+
+Aspecto práctico: campos numéricos (precios) vienen con coma decimal. No afecta descarga, pero sí uso. Si no se normaliza a punto decimal y no se tipa a número, cálculos como medias, mínimos u ordenaciones fallan. Este punto se resuelve en Punto 4 con normalización y tipado mediante \texttt{jq}. La planificación (cadencia y redirecciones) se detalla en Punto 3.
+
+Con fuente y mecánica definidas, falta encajar su lugar en el proyecto y repetición diaria. Para que cada descarga termine en directorio correcto, conserve \texttt{RUN\_ID} y deje rastro auditable, ejecución no puede depender de acciones manuales ni variables de entorno cambiantes. El siguiente apartado define arquitectura mínima (árbol de carpetas y nombres) y automatización que la hace operativa.

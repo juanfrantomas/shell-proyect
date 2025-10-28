@@ -1,40 +1,23 @@
-\chapter{PROCESO Y VALIDACIONES}
+\chapter{VALIDACIÓN DE DATOS}
 
-Este apartado convierte la descarga del Punto 2 en un conjunto de datos fiable y utilizable, listo para calcular indicadores y generar los informes del Punto 5. La regla es clara: no se calcula nada hasta demostrar que la respuesta tiene una estructura coherente, que los campos críticos existen y que los valores que después se tratarán como números han sido convertidos a tipo numérico. Todo queda registrado en el log, de modo que en el Punto 6 pueda evaluarse la calidad de cada ejecución y, si hace falta, auditar con precisión en qué fase apareció un problema.
+Este apartado convierte la descarga del Punto 2 en un conjunto de datos fiable y utilizable. La regla es clara: no se calcula nada hasta demostrar que la respuesta tiene estructura coherente, campos críticos existentes y valores numéricos correctamente tipados. Todo queda registrado en el log para auditoría posterior.
 
-El flujo comienza con una comprobación de mínimos. Primero se verifica que la variable que contiene la respuesta no esté vacía, ya que un fichero inexistente o de tamaño cero suele indicar un problema de red o permisos. A continuación se valida que el documento sea JSON bien formado mediante \texttt{jq empty}, lo que descarta descargas truncadas y errores de sintaxis. Superada esa barrera, se comprueba la presencia y el tipo de las claves críticas: \texttt{ListaEESSPrecio} debe existir y ser un array, y \texttt{Fecha} debe existir y ser una cadena. Este orden evita perder tiempo en transformaciones si la base falla y permite ``fallar pronto'' con un mensaje inequívoco en el log. En el mismo paso se extrae \texttt{FECHA\_API}, que se mostrará en los informes junto a \texttt{FECHA\_CRON} (definida en el Punto 3) para explicar con claridad cuándo se ejecutó el proceso y de qué actualización proceden los datos.
+El flujo comienza con comprobaciones de mínimos: variable no vacía, JSON bien formado con \texttt{jq empty}, presencia del array \texttt{ListaEESSPrecio} y campo \texttt{Fecha}. Este orden permite ``fallar pronto'' con mensaje inequívoco. Se extrae \texttt{FECHA\_API} para mostrarla en informes junto a \texttt{FECHA\_CRON}.
 
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 4.1 — Validación inicial del JSON}]
-echo "[...] (Procesamiento) INFO Comprobando que la variable 
-      no este vacia" >> $NOMBRE_ARCHIVO_LOG
-if [ -z "$getEstacionesValencia" ]; then
-  echo "[...] (Procesamiento) ERROR la variable esta vacia"
-  exit 1
-fi
+\textbf{Validación inicial:} El código verifica estructura y campos críticos (ver script completo en el repositorio):
 
-echo "[...] (Procesamiento) INFO Comprobando que el JSON 
-      es valido" >> "$NOMBRE_ARCHIVO_LOG"
-echo "$getEstacionesValencia" | jq empty > /dev/null \
-  && echo "[...] (Procesamiento) OK JSON valido" \
-  || { echo "[...] (Procesamiento) ERROR JSON invalido"; 
-       exit 1; }
+\begin{itemize}[noitemsep]
+  \item Comprobación de variable no vacía
+  \item Validación de JSON con \texttt{jq empty}
+  \item Verificación de \texttt{ListaEESSPrecio} como array
+  \item Extracción de \texttt{FECHA\_API}
+\end{itemize}
 
-echo "[...] (Procesamiento) INFO Verificando ListaEESSPrecio 
-      como array"
-echo "$getEstacionesValencia" | jq -e '.ListaEESSPrecio 
-      | type=="array"' \
-  && echo "[...] (Procesamiento) OK ListaEESSPrecio presente 
-      y es array" \
-  || { echo "[...] (Procesamiento) ERROR Falta 
-      ListaEESSPrecio[]"; exit 1; }
-\end{lstlisting}
-\end{figure}
-
-A partir de ahí, el objetivo es construir un conjunto homogéneo de estaciones con tipos correctos y nombres estables. El dataset de origen publica los decimales con coma, por lo que, si se deja tal cual, precios y coordenadas se tratan como texto y cálculos posteriores como medias, mínimos u ordenaciones serán incorrectos o imposibles. Se aplica una normalización explícita: \texttt{gsub(","; ".")} para sustituir coma por punto y \texttt{tonumber?} para el cast seguro a numérico, asignando \texttt{null} cuando el valor no sea convertible. En el mismo mapeo se seleccionan y renombran los campos de trabajo (por ejemplo, \texttt{precio\_g95}, \texttt{precio\_diesel}, \texttt{lat}, \texttt{lon}) y se conservan atributos útiles para la lectura (\texttt{rotulo}, \texttt{municipio}, \texttt{direccion}, \texttt{horario}). El resultado es un array \texttt{estaciones} compacto y coherente: a partir de aquí, ``precio'' es número y no texto, y ``coordenadas'' son pares lat/lon válidos o nulos bien declarados.
+\textbf{Normalización y tipado:} El dataset publica decimales con coma. Se aplica normalización explícita con \texttt{gsub(","; ".")} y cast seguro \texttt{tonumber?}, asignando \texttt{null} si no es convertible. Se seleccionan y renombran campos (\texttt{precio\_g95}, \texttt{precio\_diesel}, \texttt{lat}, \texttt{lon}) conservando atributos útiles (\texttt{rotulo}, \texttt{municipio}, \texttt{direccion}). El resultado: array \texttt{estaciones} con precios numéricos reales y coordenadas válidas o nulas bien declaradas.
 
 \begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 4.2 — Normalización y tipado con jq}]
+  \footnotesize
+  \begin{lstlisting}[language=bash]
 estaciones=$(echo "$getEstacionesValencia" | jq '[
   .ListaEESSPrecio[]
   | {
@@ -44,85 +27,24 @@ estaciones=$(echo "$getEstacionesValencia" | jq '[
              | (if . == "" then null else tonumber end) ),
       lon: ( (.["Longitud (WGS84)"] // "") | gsub(",";".") 
              | (if . == "" then null else tonumber end) ),
-      addr: ( [ .["Direccion"], .["Localidad"], 
-                .["Provincia"] ] 
-              | map(select(. != null and . != "")) 
-              | join(", ") ),
-      priceDiesel: ( (.["Precio Gasoleo A"] // "") 
-                     | gsub(",";".") 
+      addr: ( [ .["Direccion"], .["Localidad"], .["Provincia"] ] 
+              | map(select(. != null and . != "")) | join(", ") ),
+      priceDiesel: ( (.["Precio Gasoleo A"] // "") | gsub(",";".") 
                      | (if . == "" then null else tonumber end) ),
-      priceGasolina: ( ( .["Precio Gasolina 95 E5"]
-                         // .["Precio Gasolina 95 E10"]
-                         // "" )
+      priceGasolina: ( ( .["Precio Gasolina 95 E5"] // 
+                         .["Precio Gasolina 95 E10"] // "" )
                        | gsub(",";".") 
                        | (if . == "" then null else tonumber end) )
     }
 ]')
 \end{lstlisting}
+  \caption{Normalización y tipado con jq (extracto)}
 \end{figure}
 
-Antes de pasar a cálculos, se mide la calidad del dato recibido. Si un día el proveedor publica menos campos, cambia una etiqueta o parte del territorio llega sin precios, el informe puede empobrecerse y conviene que el log lo explique. Por eso se registran cuatro magnitudes sencillas: total de estaciones, estaciones sin precio para Gasolina 95, estaciones sin precio para Diésel y estaciones sin coordenadas. Con estos contadores, cualquier anomalía posterior, como un top corto o una media anómala, se relaciona de inmediato con carencias del dataset de ese día. Estos valores no aparecen en el informe final, pero sí en el registro técnico que respalda la ejecución.
+\textbf{Métricas de calidad:} Se mide la calidad registrando cuatro magnitudes: total de estaciones, estaciones sin precio G95, sin precio Diésel y sin coordenadas. Estos contadores permiten relacionar anomalías (top corto, media extraña) con carencias del dataset, sin aparecer en el informe final pero sí en el log técnico.
 
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 4.3 — Métricas de calidad del dato}]
-TOTAL_EESS=$(echo "$estaciones" | jq '. | length')
+\textbf{Filtrado por combustible:} Se preparan subconjuntos con criterio conservador: solo estaciones con precio numérico válido. Este filtrado temprano garantiza que los módulos trabajen sobre información consistente y simplifica la lectura del script.
 
-TOTAL_EESS_SIN_PRECIO_GASOLINA=$(echo "$estaciones" 
-  | jq '[.[] | select(.priceGasolina==null)] | length')
+\textbf{Guardarraíl:} Si ningún combustible dispone de precios válidos tras filtrar, el proceso se detiene con error claro. Es preferible declarar ``no hay datos útiles'' a producir informes vacíos. El log explica el motivo y permite diagnóstico rápido.
 
-TOTAL_EESS_SIN_PRECIO_DIESEL=$(echo "$estaciones" 
-  | jq '[.[] | select(.priceDiesel==null)] | length')
-
-TOTAL_EESS_SIN_COORDENADAS=$(echo "$estaciones" 
-  | jq '[.[] | select(.lat==null or .lon==null)] | length')
-
-echo "[...] (Informe) INFO Carencia de datos: 
-      sin_G95=$TOTAL_EESS_SIN_PRECIO_GASOLINA 
-      sin_Diesel=$TOTAL_EESS_SIN_PRECIO_DIESEL 
-      sin_Coords=$TOTAL_EESS_SIN_COORDENADAS"
-\end{lstlisting}
-\end{figure}
-
-Con la base ya coherente, se preparan los subconjuntos por combustible con un criterio conservador: solo entran estaciones con precio numérico válido. Este filtrado temprano aún no calcula estadísticas, pero garantiza que los módulos de medida trabajen sobre información consistente y evita lógica defensiva de última hora en los informes. Además, al separar desde ya \texttt{estaciones\_g95} y \texttt{estaciones\_diesel}, se simplifica la lectura del script y se reduce el riesgo de mezclar tipos en expresiones complejas.
-
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 4.4 — Filtrado por combustible}]
-# Conteo de estaciones validas por combustible
-G95_COUNT=$(echo "$estaciones" | jq '
-  [ .[] | .priceGasolina ] 
-  | map(select(.!=null)) 
-  | length')
-
-DIESEL_COUNT=$(echo "$estaciones" | jq '
-  [ .[] | .priceDiesel ] 
-  | map(select(.!=null)) 
-  | length')
-\end{lstlisting}
-\end{figure}
-
-Por último, se incorpora un guardarraíl para casos límite. Si, tras filtrar, ninguno de los combustibles dispone de precios válidos, el proceso se detiene con un error claro. Es preferible declarar ``hoy no hay datos útiles'' a producir informes vacíos o engañosos. Este patrón, detenerse cuando falta la precondición fundamental, mantiene la integridad del sistema y simplifica el diagnóstico: basta con leer el final del log para saber por qué no se generaron resultados ese día, tal y como se detalla en el Punto 6 con la pauta de registro y el \texttt{trap} de finalización.
-
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 4.5 — Guardarraíl para conjuntos vacíos}]
-if (( ${G95_COUNT:-0} > 0 )); then
-  # calcular metricas
-  echo "[...] (Informe) OK Estadisticos descriptivos obtenidos 
-        para Gasolina 95"
-else
-  G95_MIN=""; G95_MAX=""; G95_AVG=""
-  echo "[...] (Informe) ERROR No hay datos validos para 
-        Gasolina 95"
-fi
-
-if (( ${DIESEL_COUNT:-0} > 0 )); then
-  # calcular metricas
-  echo "[...] (Informe) OK Estadisticos descriptivos obtenidos 
-        para Diesel"
-else
-  DIESEL_MIN=""; DIESEL_MAX=""; DIESEL_AVG=""
-  echo "[...] (Informe) ERROR No hay datos validos para Diesel"
-fi
-\end{lstlisting}
-\end{figure}
-
-Con estas validaciones, normalizaciones y controles, el proyecto entrega a los apartados siguientes un dataset tipado, segmentado y coherente. Desde aquí, el Punto 5 puede centrarse en medir y presentar, y cualquier referencia a planificación, estructura de carpetas o criterios de logging queda en los Puntos 3 y 6.
+Con estas validaciones, normalizaciones y controles, el proyecto entrega un dataset tipado, segmentado y coherente al Punto 5 para medición y presentación.

@@ -1,122 +1,55 @@
-\chapter{REGISTRO Y CALIDAD}
+\chapter{REGISTRO Y AUDITORÍA}
 
-Este apartado define cómo se audita cada ejecución y qué señales permiten juzgar su calidad sin abrir el código ni los datos crudos. La idea es que, leyendo el log, pueda saberse qué pasó, cuándo, en qué fase, con qué resultado y con qué calidad de datos. Para ello se usan mensajes con marca temporal ISO (\texttt{[\%F \%T]}), una taxonomía de fases alineada con el flujo del proyecto, niveles de severidad simples (INFO, OK, ERROR) y una línea de finalización inequívoca que refleja el código de salida del proceso. Además, se separan dos canales: \texttt{log.txt} (bitácora funcional del script) y \texttt{cron.log} (todo lo que cron redirige por stdout/stderr; ver Punto 3). Con esta combinación, diagnosticar una incidencia lleva segundos: si cron no lanza, el rastro está en \texttt{cron.log}; si el script encuentra un JSON inválido o una tabla vacía, queda documentado en \texttt{log.txt}.
+Este apartado define cómo se audita cada ejecución y qué señales permiten juzgar su calidad. Leyendo el log puede saberse qué pasó, cuándo, en qué fase, con qué resultado y calidad de datos. Se usan mensajes con marca temporal ISO (\texttt{[\%F \%T]}), taxonomía de fases alineada con el flujo, niveles simples (INFO, OK, ERROR) y línea de finalización inequívoca que refleja el código de salida. Se separan dos canales: \texttt{log.txt} (bitácora funcional del script) y \texttt{cron.log} (stdout/stderr de cron). Con esto, diagnosticar incidencias lleva segundos.
 
-La forma del mensaje evita ambigüedades y favorece el análisis posterior con herramientas básicas (grep, less, awk). Cada línea empieza por \texttt{[YYYY-MM-DD HH:MM:SS]}, sigue con la fase entre paréntesis (Inicio, Descarga, Procesamiento, Indicadores, Informe, Finalizacion), un nivel y un mensaje claro. Las fases están ordenadas como el propio flujo, de modo que lo que aparece en (Indicadores) nunca precede a (Procesamiento) y es trivial localizar el tramo en el que ocurrió un problema. Los niveles tienen significado estable: INFO señala un hito (por ejemplo, ``haciendo petición a la URL''), OK marca chequeos superados (por ejemplo, ``JSON válido'', ``Top-5 calculado'') y ERROR identifica fallos que requieren atención; si el error es crítico, el script sale con código distinto de cero en ese mismo punto.
+\textbf{Formato y fases:} Cada línea empieza por \texttt{[YYYY-MM-DD HH:MM:SS]}, sigue con fase entre paréntesis (Inicio, Descarga, Procesamiento, Indicadores, Informe, Finalizacion), nivel y mensaje claro. Las fases siguen el flujo, facilitando localizar problemas. Niveles: INFO (hitos), OK (chequeos superados), ERROR (fallos críticos con \texttt{exit 1}).
 
 \begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 6.1 — Formato de mensajes y fases del log}]
-# Ejemplos de mensajes de log en distintas fases:
-
-echo "[$(date '+%F %T')] (Inicio) INFO Identificador de la 
-      ejecucion del CRON(FECHA)=$RUN_ID" >> $NOMBRE_ARCHIVO_LOG
-
-echo "[$(date '+%F %T')] (Descarga) INFO Haciendo peticion 
-      a $urlValencia" >> $NOMBRE_ARCHIVO_LOG
+  \footnotesize
+  \begin{lstlisting}[language=bash]
+# Ejemplos de mensajes en distintas fases
+echo "[$(date '+%F %T')] (Inicio) INFO Identificador=$RUN_ID" 
+     >> $NOMBRE_ARCHIVO_LOG
 
 echo "[$(date '+%F %T')] (Descarga) OK Peticion Valida: 
-      Estado Peticion HTTP = $status" >> $NOMBRE_ARCHIVO_LOG
+     HTTP=$status" >> $NOMBRE_ARCHIVO_LOG
 
 echo "[$(date '+%F %T')] (Procesamiento) OK JSON valido" 
-      >> "$NOMBRE_ARCHIVO_LOG"
+     >> "$NOMBRE_ARCHIVO_LOG"
 
-echo "[$(date '+%F %T')] (Indicadores) INFO Calculando 
-      Top 5 Gasolina 95 por precio" >> "$NOMBRE_ARCHIVO_LOG"
+echo "[$(date '+%F %T')] (Indicadores) INFO Calculando Top 5" 
+     >> "$NOMBRE_ARCHIVO_LOG"
 
-echo "[$(date '+%F %T')] (Informe) OK Informe generado en: 
-      $NOMBRE_ARCHIVO_INFORME_TXT" >> "$NOMBRE_ARCHIVO_LOG"
+echo "[$(date '+%F %T')] (Informe) OK Informe generado: $TXT" 
+     >> "$NOMBRE_ARCHIVO_LOG"
 \end{lstlisting}
+  \caption{Formato de mensajes y fases del log}
 \end{figure}
 
-Cuando aparece un ERROR, el criterio es salida controlada: se registra el motivo y se interrumpe la ejecución con \texttt{exit 1}. Esto evita falsos positivos (informes generados a medias o con datos corruptos) y deja una pista inequívoca para quien revise los logs. Ejemplos típicos son un HTTP no 2xx en la descarga (Punto 2) o un JSON inválido al empezar el procesamiento (Punto 4). En ambos casos, el log explica el porqué y la ejecución no avanza a etapas que dependerían de un dato inexistente o incoherente.
+\textbf{Gestión de errores:} Cuando aparece ERROR, el criterio es salida controlada: registrar motivo e interrumpir con \texttt{exit 1}. Esto evita falsos positivos (informes con datos corruptos) y deja pista inequívoca. Ejemplos: HTTP no 2xx o JSON inválido.
+
+\textbf{Finalización con trap:} Se usa \texttt{trap} para capturar código de salida y escribir línea de cierre. Si código es 0, indica éxito; si no, informa del código. Leer el último bloque de \texttt{log.txt} basta para saber si el día terminó bien o mal.
 
 \begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 6.2 — Registro de errores con salida controlada}]
-# Error en descarga HTTP
-if [ "$status" -ge 200 ] && [ "$status" -lt 300 ]; then
-  echo "[...] (Descarga) OK Peticion Valida: 
-        Estado Peticion HTTP = $status"
-else
-  echo "[...] (Descarga) ERROR Ha fallado la peticion a 
-        $urlValencia. Error HTTP: $status"
-  exit 1
-fi
-
-# Error en validacion JSON
-echo "$getEstacionesValencia" | jq empty > /dev/null \
-  && echo "[...] (Procesamiento) OK JSON valido" \
-  || { echo "[...] (Procesamiento) ERROR JSON invalido"; 
-       exit 1; }
-\end{lstlisting}
-\end{figure}
-
-Para que quede constancia del resultado global, al final del script se usa un \texttt{trap} que captura el código de salida y escribe una línea de cierre con la fase (Finalizacion). Si el código es 0, se indica que ``el programa se ha ejecutado correctamente''; si no, se informa del código concreto. Con esto, leer el último bloque de \texttt{log.txt} basta para saber si el día ha terminado bien o mal, y cualquier monitorización externa puede buscar esa cadena para alertar solo cuando falte o indique error. Esta línea de cierre se complementa con los INFO de generación del TXT y del HTML (Punto 5), que enlazan el estado del programa con los artefactos producidos.
-
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 6.3 — Finalización inequívoca con trap}]
-# Trap para comprobar el exito de la ejecucion
+  \footnotesize
+  \begin{lstlisting}[language=bash]
 trap 'code=$?; if [ $code -eq 0 ]; then
-  echo "[$(date "+%F %T")] (Finalizacion) INFO El programa 
-        se ha ejecutado correctamente" >> "$NOMBRE_ARCHIVO_LOG"
+  echo "[$(date "+%F %T")] (Finalizacion) INFO 
+       Programa ejecutado correctamente" >> "$NOMBRE_ARCHIVO_LOG"
 else
-  echo "[$(date "+%F %T")] (Finalizacion) ERROR El programa 
-        termino con codigo $code" >> "$NOMBRE_ARCHIVO_LOG"
+  echo "[$(date "+%F %T")] (Finalizacion) ERROR 
+       Programa termino con codigo $code" >> "$NOMBRE_ARCHIVO_LOG"
 fi' EXIT
 \end{lstlisting}
+  \caption{Finalización inequívoca con trap}
 \end{figure}
 
-La separación entre \texttt{log.txt} y \texttt{cron.log} añade otra capa de claridad. \texttt{log.txt} recoge lo que hace el script (fases, validaciones, indicadores, informes), mientras que \texttt{cron.log} captura cómo se lanzó (errores de ruta, permisos, PATH incompleto, etc.). Dado que cron ejecuta con un entorno mínimo (ver Punto 3), redirigir stdout y stderr a \texttt{cron.log} evita perder mensajes del planificador y permite diferenciar si el problema estaba antes de entrar en el script (por ejemplo, ``no se encuentra el fichero'') o durante su ejecución (por ejemplo, ``JSON inválido'').
+\textbf{Separación de logs:} \texttt{log.txt} recoge lo que hace el script (fases, validaciones, indicadores); \texttt{cron.log} captura cómo se lanzó (errores de ruta, permisos, PATH incompleto). Esto diferencia problemas antes de entrar al script vs. durante ejecución.
 
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 6.4 — Redirección de cron a cron.log}]
-# Ejemplo de linea en crontab con redireccion:
-SHELL=/bin/bash
-PATH=/usr/local/bin:/usr/bin:/bin
+\textbf{Señales de calidad:} El log anota total de estaciones, cuántas carecen de precio G95/Diésel y cuántas sin coordenadas. Si un día el Top-5 es corto o la media extraña, el log permite atribuirlo a carencia de la fuente, no error en la lógica.
 
-0 8 * * * /ruta/absoluta/al/proyecto/analisis_json.sh \
-  >> /ruta/absoluta/al/proyecto/cron.log 2>&1
-\end{lstlisting}
-\end{figure}
+\textbf{Trazabilidad:} Todo se ancla en \texttt{RUN\_ID}. Aunque no aparece en cada línea, sí en mensajes clave (rutas de informes generados), permitiendo saltar del log al TXT/HTML y JSON crudo correspondiente para auditoría reproducible.
 
-Además del estado del programa, el log deja señales sobre la calidad del dato. Como se definió en el Punto 4, por cada ejecución se anotan el número total de estaciones recibidas, cuántas carecen de precio en Gasolina 95 y Diésel y cuántas llegan sin coordenadas. Estas cifras no están dirigidas al usuario final, pero sí a quien mantiene la automatización: si un día el Top-5 es corto o la media es extraña, el log permite atribuirlo de inmediato a una carencia objetiva de la fuente en esa fecha, en lugar de culpar a la lógica del informe (Punto 5). La interpretación de resultados se apoya así en hechos verificables.
+\textbf{Buenas prácticas:} Timestamp ISO para ordenación, mensajes concisos y accionables, locale consistente en formato de precios. Para instalaciones con semanas de ejecución, recomendable rotar logs con política sencilla (retener 7 días, comprimir y truncar) usando logrotate.
 
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 6.5 — Señales de calidad de datos en el log}]
-TOTAL_EESS=$(echo "$estaciones" | jq '. | length')
-
-TOTAL_EESS_SIN_PRECIO_GASOLINA=$(echo "$estaciones" 
-  | jq '[.[] | select(.priceGasolina==null)] | length')
-
-TOTAL_EESS_SIN_PRECIO_DIESEL=$(echo "$estaciones" 
-  | jq '[.[] | select(.priceDiesel==null)] | length')
-
-TOTAL_EESS_SIN_COORDENADAS=$(echo "$estaciones" 
-  | jq '[.[] | select(.lat==null or .lon==null)] | length')
-
-echo "[...] (Informe) INFO Carencia de datos: 
-      sin_G95=$TOTAL_EESS_SIN_PRECIO_GASOLINA 
-      sin_Diesel=$TOTAL_EESS_SIN_PRECIO_DIESEL 
-      sin_Coords=$TOTAL_EESS_SIN_COORDENADAS" >> $NOMBRE_ARCHIVO_LOG
-\end{lstlisting}
-\end{figure}
-
-Toda esta traza se ancla en el \texttt{RUN\_ID} de la ejecución (Puntos 2 y 3). Aunque \texttt{RUN\_ID} no aparezca en cada línea, sí figura en los mensajes clave (por ejemplo, al anunciar las rutas de los informes generados), lo que permite saltar del log al TXT/HTML y al JSON crudo correspondiente. Este vínculo sostiene la auditoría reproducible: si algo no cuadra en un informe, se puede reconstruir la historia completa con los artefactos exactos de ese día y hora.
-
-Como buenas prácticas operativas, se mantiene el timestamp ISO para facilitar ordenación y búsquedas; se evita la verbosidad inútil (mensajes concisos y accionables); y se cuida el locale al formatear precios (la función del Punto 5 fuerza notación coherente sin depender de la configuración del sistema). Para instalaciones con varias semanas de ejecución, es recomendable rotar \texttt{log.txt} y \texttt{cron.log} con una política sencilla (retener 7 días, comprimir y truncar), de forma que el tamaño de los ficheros no crezca indefinidamente sin aportar valor.
-
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 6.6 — Propuesta de logrotate (opcional)}]
-# Archivo /etc/logrotate.d/shell-proyect
-/ruta/absoluta/al/proyecto/log.txt
-/ruta/absoluta/al/proyecto/cron.log {
-    daily
-    rotate 7
-    compress
-    copytruncate
-    missingok
-    notifempty
-}
-\end{lstlisting}
-\end{figure}
-
-Con este esquema, el proyecto no solo hace (descarga, valida, calcula, informa), también explica lo que hace de manera legible y verificable. La consecuencia práctica es doble: resolución rápida de incidencias y confianza en que cada informe está respaldado por un rastro claro, desde el dato crudo hasta la línea final de éxito o error.
+Con este esquema, el proyecto no solo hace (descarga, valida, calcula, informa), también explica lo que hace de manera legible y verificable: resolución rápida de incidencias y confianza en que cada informe está respaldado por rastro claro desde dato crudo hasta línea final de éxito o error.

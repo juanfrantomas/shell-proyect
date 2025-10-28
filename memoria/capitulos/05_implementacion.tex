@@ -1,182 +1,45 @@
-\chapter{INFORME E INDICADORES}
+\chapter{GENERACIÓN DE INFORMES}
 
-Con el dataset validado y normalizado (Punto 4), este apartado se centra en medir y presentar. El objetivo es doble: calcular indicadores básicos pero informativos por combustible (cuántas estaciones tienen precio válido y cuáles son el mínimo, la media y el máximo) y ofrecer el resultado en dos formatos que cubren usos distintos: un TXT orientado a lectura rápida y un HTML más cómodo para consulta en pantalla. Todo mantiene la trazabilidad por \texttt{RUN\_ID} y deja hitos en el log, sin repetir la política de registro (Punto 6).
+Con el dataset validado y normalizado, este apartado mide y presenta. El objetivo: calcular indicadores básicos por combustible (conteo, mínimo, media, máximo) y ofrecer resultado en TXT para lectura rápida y HTML para consulta en pantalla, manteniendo trazabilidad por \texttt{RUN\_ID}.
 
-El cálculo parte de los subconjuntos \texttt{estaciones\_g95} y \texttt{estaciones\_diesel} preparados en el Punto 4. Para cada combustible se obtiene el conteo de estaciones con precio válido y, si el conteo es mayor que cero, se calculan mínimo, máximo y media aritmética. Esta precaución evita divisiones por cero y garantiza que, si el proveedor devuelve un bloque vacío, el informe lo refleje con un mensaje explícito y no con cifras espurias. El trabajo opera sobre valores numéricos reales (convertidos con \texttt{tonumber?} en el Punto 4), de modo que ordenar y agregar es directo y fiable.
+\textbf{Cálculo de métricas:} Se parte de los subconjuntos preparados. Para cada combustible se obtiene conteo de estaciones con precio válido y, si mayor que cero, se calculan mínimo, máximo y media aritmética. Esta precaución evita divisiones por cero. El trabajo opera sobre valores numéricos reales, haciendo ordenación y agregación directa y fiable.
+
+Además de estadísticas globales, se incluye Top-5 con mejor precio. Se ordena por precio ascendente y se extraen las cinco mejores (o las disponibles si hay menos). No es un ránking complejo, sino una pista diaria de dónde mirar primero.
 
 \begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 5.1 — Cálculo de métricas por combustible}]
-# Metricas Gasolina 95
+  \footnotesize
+  \begin{lstlisting}[language=bash]
+# Metricas y Top-5 para Gasolina 95
 G95_COUNT=$(echo "$estaciones" | jq '
-  [ .[] | .priceGasolina ] 
-  | map(select(.!=null)) 
-  | length')
+  [ .[] | .priceGasolina ] | map(select(.!=null)) | length')
 
 if (( ${G95_COUNT:-0} > 0 )); then
   G95_MIN=$(echo "$estaciones" | jq '
-    [ .[] | .priceGasolina ] 
-    | map(select(.!=null)) 
-    | min 
-    | (. * 1000 | round / 1000)')
-  
+    [ .[] | .priceGasolina ] | map(select(.!=null)) 
+    | min | (. * 1000 | round / 1000)')
   G95_MAX=$(echo "$estaciones" | jq '
-    [ .[] | .priceGasolina ] 
-    | map(select(.!=null)) 
-    | max 
-    | (. * 1000 | round / 1000)')
-  
+    [ .[] | .priceGasolina ] | map(select(.!=null)) 
+    | max | (. * 1000 | round / 1000)')
   G95_AVG=$(echo "$estaciones" | jq '
-    [ .[] | .priceGasolina ] 
-    | map(select(.!=null)) 
-    | if length>0 then 
-        ((add/length) * 1000 | round / 1000) 
+    [ .[] | .priceGasolina ] | map(select(.!=null)) 
+    | if length>0 then ((add/length) * 1000 | round / 1000) 
       else null end')
   
-  echo "[...] (Informe) OK Estadisticos descriptivos obtenidos 
-        para Gasolina 95"
-else
-  G95_MIN=""; G95_MAX=""; G95_AVG=""
-  echo "[...] (Informe) ERROR No hay datos validos para 
-        Gasolina 95"
+  TOP5_G95=$(echo "$estaciones" | jq '
+    [ .[] | select(.priceGasolina!=null)
+      | { id, name, addr, priceGasolina }]
+    | sort_by(.priceGasolina) | .[0:5]')
 fi
 \end{lstlisting}
+  \caption{Cálculo de métricas y Top-5 por combustible}
 \end{figure}
 
-Además de las estadísticas globales, el informe incluye una selección de estaciones con mejor precio. Se ordena por el campo de precio ascendente y se extrae un Top-5 (si hay menos de cinco, se muestran las disponibles). Al ser precios numéricos, la ordenación es estable y coherente. La intención no es construir un ránking complejo, sino dar una pista diaria de dónde mirar primero. Esta selección alimenta tanto el TXT como el HTML.
+\textbf{Formateo unificado:} Internamente se usa punto decimal; hacia el usuario se muestra con coma y tres decimales para mantener homogeneidad. El mismo criterio se aplica en cabeceras y filas del Top-5, evitando discrepancias entre formatos:
 
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 5.2 — Selección del Top-5 por combustible}]
-echo "[...] (Informe) INFO Calculando Top 5 Gasolina 95 
-      por precio"
+\texttt{(. * 1000 | round / 1000) | tostring | gsub("\\textbackslash\\textbackslash."; ",")}
 
-TOP5_G95=$(echo "$estaciones" | jq '
-  [ .[] | select(.priceGasolina!=null)
-    | { id, name, addr, lat, lon, priceGasolina }
-  ]
-  | sort_by(.priceGasolina)
-  | .[0:5]
-')
+\textbf{Informe TXT:} Prioriza lectura inmediata. Abre con cabecera que muestra \texttt{FECHA\_CRON} y \texttt{FECHA\_API}, seguida de dos bloques (Gasolina 95 y Diésel A) con conteo y estadísticas (mín/med/max). Debajo, lista numerada con Top-5 indicando rótulo, municipio, precio y dirección. Si un combustible carece de precios válidos, imprime aviso claro.
 
-G95_TOP_N=$(echo "$TOP5_G95" | jq 'length' || echo 0)
-if (( ${G95_TOP_N:-0} > 0 )); then
-  echo "[...] (Informe) OK Ranking Top 5 Gasolina 95 generado 
-        (registros=$G95_TOP_N)"
-else
-  echo "[...] (Informe) ERROR Sin datos validos para Top 5 
-        Gasolina 95"
-fi
-\end{lstlisting}
-\end{figure}
+\textbf{Informe HTML:} Ofrece misma información organizada en tablas con capa visual mínima. Incluye encabezado con fechas y, por combustible, título con insignias de min/med/max. Cada fila del Top-5 recibe clase según relación con la media (\texttt{low}, \texttt{avg}, \texttt{high}) para resaltar lo más barato. HTML autoinclusivo con estilos embebidos. Ver implementación completa en el repositorio.
 
-Para la presentación se unifica el formateo de precios. Internamente todo usa punto decimal; hacia el usuario se muestra con coma y tres decimales para mantener homogeneidad y no depender del locale. Se define una utilidad breve que transforma el número en cadena formateada; así, el mismo criterio se aplica en cabeceras y filas del Top-5, evitando discrepancias entre TXT y HTML.
-
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 5.3 — Formateo de precios en jq}]
-# Dentro del procesamiento con jq para redondear a 3 decimales:
-(. * 1000 | round / 1000)
-
-# Para sustituir punto por coma se puede usar gsub en la salida:
-| tostring | gsub("\\."; ",")
-\end{lstlisting}
-\end{figure}
-
-El informe TXT prioriza la lectura inmediata. Abre con una cabecera que muestra la fecha de ejecución (\texttt{FECHA\_CRON}, del Punto 3) y la fecha oficial del dataset (\texttt{FECHA\_API}, del Punto 4) y, a continuación, presenta dos bloques (Gasolina 95 y Diésel A) con el conteo de estaciones y las tres estadísticas (mín/med/max). Debajo, una lista numerada con el Top-5 indicando rótulo, municipio, precio y dirección. Si un combustible carece de precios válidos, se imprime un aviso claro (``No hay precios válidos…''). La estructura busca que, al abrir el fichero, sea evidente qué día y qué datos se ven y, en dos líneas, el rango de precios y por dónde empezar.
-
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 5.4 — Generación del informe TXT (extracto)}]
-generar_informe_txt() {
-  if (( ${TOTAL_EESS:-0} > 0 )); then
-    echo "[...] (Informe) INFO Generando informe en txt"
-    {
-      echo "=============================================="
-      echo "   INFORME DE GASOLINERAS DE VALENCIA"
-      echo "=============================================="
-      echo ""
-      echo "Fecha del cron:        $FECHA_CRON"
-      echo "Fechas de la API:      $FECHA_API"
-      echo ""
-      echo "----------------------------------------------"
-      echo "GASOLINA 95"
-      echo "----------------------------------------------"
-      echo "Precio minimo:         $G95_MIN EUR/L"
-      echo "Precio maximo:         $G95_MAX EUR/L"
-      echo "Precio medio:          $G95_AVG EUR/L"
-      echo ""
-      echo "Top 5 mas baratas:"
-      echo "$TOP5_G95"
-      # ... (sigue con Diesel)
-    } > "$NOMBRE_ARCHIVO_INFORME_TXT"
-    echo "[...] (Informe) OK Informe generado en: 
-          $NOMBRE_ARCHIVO_INFORME_TXT"
-  fi
-}
-\end{lstlisting}
-\end{figure}
-
-El informe HTML ofrece la misma información organizada en tablas y con una capa visual mínima. Incluye un encabezado con las dos fechas (\texttt{FECHA\_CRON} y \texttt{FECHA\_API}) y, para cada combustible, un título con insignias de min/med/max formateadas. Debajo, una tabla con el Top-5 (estación, municipio, precio con coma decimal y dirección). Cada fila recibe una clase según su relación con la media del combustible (\texttt{low}, \texttt{avg}, \texttt{high}) para resaltar lo más barato sin recurrir a gráficos ni dependencias externas. El HTML es autoinclusivo (estilos embebidos). Si un combustible no tiene datos válidos, se muestran cifras vacías y una tabla sin filas, en coherencia con el TXT.
-
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 5.5 — Generación del informe HTML (extracto)}]
-generar_informe_html() {
-  echo "[...] (Informe) INFO Generando informe en html"
-  
-  cat > "$NOMBRE_ARCHIVO_INFORME_HTML" <<EOF
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Informe de Gasolineras de Valencia</title>
-  <style>
-    body { font-family: sans-serif; margin: 20px; }
-    .price.low { color: green; font-weight: bold; }
-    .price.high { color: red; font-weight: bold; }
-    .price.avg { color: black; }
-    table { border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 8px; }
-  </style>
-</head>
-<body>
-  <h1>Informe de Gasolineras de Valencia</h1>
-  <p>Fecha del cron: $FECHA_CRON</p>
-  <p>Fechas de la API: $FECHA_API</p>
-  
-  <h2>GASOLINA 95</h2>
-  <p>Minimo: <span class="price low">$G95_MIN EUR/L</span></p>
-  <p>Maximo: <span class="price high">$G95_MAX EUR/L</span></p>
-  <p>Medio: <span class="price avg">$G95_AVG EUR/L</span></p>
-  
-  <h3>Top 5 mas baratas:</h3>
-  <table>
-    <tr><th>ID</th><th>Nombre</th><th>Direccion</th>
-        <th>Precio</th></tr>
-$(echo "$TOP5_G95" | jq --arg avg "$G95_AVG" -r '
-  .[] | "<tr><td>\(.id)</td><td>\(.name)</td>
-         <td>\(.addr)</td>
-         <td class=\"price " + 
-         (if .priceGasolina < (\$avg | tonumber) then "low" 
-          elif .priceGasolina > (\$avg | tonumber) then "high" 
-          else "avg" end) + "\">
-         \((.priceGasolina * 1000 | round / 1000))
-         </td></tr>"')
-  </table>
-  <!-- ... (sigue con Diesel) -->
-</body>
-</html>
-EOF
-}
-\end{lstlisting}
-\end{figure}
-
-Ambos informes se nombran con el \texttt{RUN\_ID} de la ejecución y se guardan bajo \texttt{informes/}. Así se preserva la trazabilidad de los Puntos 2 y 3: al ver un informe, se localizan el JSON crudo del mismo \texttt{RUN\_ID} y la traza correspondiente en el log. El script deja constancia explícita de la generación del TXT y del HTML con mensajes INFO, lo que permite comprobar de un vistazo —en el Punto 6— si la ejecución llegó a buen puerto y qué artefactos produjo.
-
-\begin{figure}[H]
-  \begin{lstlisting}[language=bash, caption={Figura 5.6 — Confirmación de informes generados}]
-echo "[...] (Informe) OK Informe TXT generado en: 
-      $NOMBRE_ARCHIVO_INFORME_TXT"
-
-echo "[...] (Informe) OK Informe HTML generado en: 
-      $NOMBRE_ARCHIVO_INFORME_HTML"
-\end{lstlisting}
-\end{figure}
-
-Con esta capa de indicadores y presentación, el proyecto ofrece una salida diaria clara y utilizable sin repetir lógica de limpieza ni detalles de planificación. El Punto 6 cerrará el círculo describiendo el criterio de registro y calidad: qué se escribe en el log, cómo se distingue éxito de error y cómo localizar con rapidez una incidencia cuando algo no cuadra.
+Ambos informes se nombran con \texttt{RUN\_ID} y guardan en \texttt{informes/}, preservando trazabilidad: al ver un informe, se localizan el JSON crudo y traza del log. El script deja constancia con mensajes INFO de generación TXT y HTML, permitiendo comprobar si la ejecución terminó bien y qué artefactos produjo.

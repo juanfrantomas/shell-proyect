@@ -1,16 +1,58 @@
-\chapter{ARQUITECTURA Y AUTOMATIZACIÓN}
+\chapter{ARQUITECTURA}
 
-Con la fuente y la mecánica de obtención ya definidas, este apartado coloca esa descarga dentro de una arquitectura mínima y repetible y detalla la automatización diaria que la sostiene. La idea es simple: al ejecutarse desde cron, el proyecto hace siempre lo mismo, en el mismo sitio, y deja un rastro inequívoco de lo ocurrido, sin depender de que el usuario esté delante.
+Este apartado coloca la descarga dentro de arquitectura mínima y repetible, detallando automatización diaria. La idea: al ejecutarse desde cron, el proyecto hace siempre lo mismo, en el mismo sitio, dejando rastro inequívoco, sin depender del usuario.
 
-La arquitectura parte de un directorio base anclado al propio script. En ejecución programada el directorio de trabajo no es predecible; por eso se obtiene \texttt{BASE\_DIR} a partir de la ruta real del script y todas las lecturas y escrituras cuelgan de ahí. Ese anclaje evita efectos de \texttt{pwd} variables y asegura que los artefactos terminen siempre bajo el proyecto, no en carpetas temporales ni en \texttt{\$HOME}. A partir de \texttt{BASE\_DIR} se organizan tres subcarpetas: \texttt{datos/} para el JSON crudo, \texttt{informes/} para las salidas en TXT y HTML, y \texttt{planificacion/} para el material de cron y la documentación. El árbol no es ornamental: permite revisar y entregar con orden y, sobre todo, facilita reconstruir una ejecución concreta si algo falla.
+\textbf{Estructura de directorios:} La arquitectura parte de directorio base anclado al script. En ejecución programada el directorio de trabajo no es predecible; por eso se obtiene \texttt{BASE\_DIR} a partir de ruta real del script y todas las lecturas/escrituras cuelgan de ahí. Esto evita efectos de \texttt{pwd} variables y asegura que artefactos terminen bajo el proyecto.
 
-Para que esa estructura exista incluso en la primera ejecución, el script abre con una función de preparación de carpetas. No es una simple llamada a \texttt{mkdir -p}: además de crear lo que falte, deja constancia en el registro asociado a cron, de forma que pueda auditarse el estado del entorno, creado o ya existente. Este detalle resulta valioso al desplegar en máquinas nuevas o en directorios limpios, porque el log de arranque ofrece una pista inmediata sobre permisos y rutas.
+\begin{figure}[H]
+  \centering
+  \footnotesize
+  \begin{verbatim}
+shell-proyect/
+|-- analisis_json.sh      (script principal)
+|-- log.txt               (bitacora funcional)
+|-- cron.log              (salidas de cron)
+|-- datos/                (JSON descargados)
+|   +-- estaciones_*.json
+|-- informes/             (TXT y HTML generados)
+|   |-- informe_*.txt
+|   +-- informe_*.html
++-- planificacion/        (configuracion cron)
+    +-- crontab.txt
+\end{verbatim}
+  \caption{Estructura de directorios del proyecto}
+\end{figure}
 
-La trazabilidad se apoya en una convención de nombres alrededor de un identificador temporal \texttt{RUN\_ID}. Ese valor se inserta en los nombres del JSON descargado y de los informes que se generarán, de modo que cada ejecución queda encapsulada bajo su propio sello de tiempo. En paralelo se mantienen dos registros complementarios: \texttt{log.txt}, como bitácora funcional del proceso de descarga, procesamiento, informes y final; y \texttt{cron.log}, como traza del planificador con todo lo que cron envía por stdout y stderr. Separarlos acelera el diagnóstico: si cron no encuentra el script o falla el PATH, la evidencia aparece en \texttt{cron.log}; si lo que falla es una validación o un cálculo, queda documentado en \texttt{log.txt}.
+A partir de \texttt{BASE\_DIR} se organizan tres subcarpetas: \texttt{datos/} para JSON crudo, \texttt{informes/} para salidas en TXT y HTML, y \texttt{planificacion/} para material de cron. El árbol facilita revisión y entrega con orden, y permite reconstruir ejecución concreta si algo falla.
 
-La automatización se resuelve con una entrada de cron diaria. Más allá de la frecuencia concreta, hay tres decisiones que garantizan estabilidad: (i) rutas absolutas tanto al intérprete como al script y a los ficheros de log; (ii) definición explícita de \texttt{SHELL} y \texttt{PATH} al inicio del bloque para no depender del entorno interactivo; (iii) redirección de salida estándar y de error al \texttt{cron.log} del proyecto. Con esos elementos la ejecución programada es reproducible y auditable. La línea de cron se guarda además en \texttt{planificacion/crontab.txt}, lo que permite incluirla tal cual en la memoria y verificar que la entrega corresponde con lo descrito.
+Para que estructura exista incluso en primera ejecución, el script abre con función de preparación de carpetas. Además de crear lo que falte con \texttt{mkdir -p}, deja constancia en registro, permitiendo auditar estado del entorno.
 
-El cierre del ciclo lo da un mecanismo de finalización controlada mediante \texttt{trap}. Al capturar el código de retorno global del script, se imprime una línea final inequívoca en \texttt{log.txt}: éxito si el código es 0; error con el código concreto en caso contrario. Esta técnica evita falsos positivos y simplifica la revisión, porque basta con ir al final del log para saber cómo terminó.
+\textbf{Trazabilidad y registro:} Se apoya en convención de nombres alrededor de \texttt{RUN\_ID}. Ese valor se inserta en nombres del JSON descargado y de informes generados, encapsulando cada ejecución bajo su propio sello temporal. Se mantienen dos registros complementarios:
 
-En términos prácticos, con estos elementos la descarga presentada en el Punto 2 encaja en un marco que no depende del contexto: el script sabe dónde escribir, cron sabe cómo lanzarlo y ambos dejan huella. El detalle de validaciones sobre estructura del JSON, tipos y normalización de decimales se desarrolla en el Punto 4, y el formato de los informes en el Punto 5. Como mejora opcional, si se teme que dos ejecuciones coincidan, puede añadirse antisolapamiento con \texttt{flock}, envolviendo la llamada de cron para asegurar exclusión mutua.
+\begin{itemize}[noitemsep]
+  \item \texttt{log.txt}: Bitácora funcional del proceso (descarga, procesamiento, informes)
+  \item \texttt{cron.log}: Traza del planificador (stdout/stderr de cron)
+\end{itemize}
+
+Separarlos acelera diagnóstico: si cron no encuentra script o falla PATH, evidencia en \texttt{cron.log}; si falla validación o cálculo, documentado en \texttt{log.txt}.
+
+\textbf{Automatización con cron:} Se resuelve con entrada diaria. Tres decisiones garantizan estabilidad: (i) rutas absolutas al intérprete, script y ficheros de log; (ii) definición explícita de \texttt{SHELL} y \texttt{PATH} al inicio del bloque; (iii) redirección de salida estándar y error al \texttt{cron.log} del proyecto. La línea de cron se guarda en \texttt{planificacion/crontab.txt}.
+
+\begin{figure}[H]
+  \footnotesize
+  \begin{lstlisting}[language=bash]
+# Configuracion de cron en crontab
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+
+# Ejecucion diaria a las 8:00 AM
+0 8 * * * /ruta/absoluta/shell-proyect/analisis_json.sh \
+  >> /ruta/absoluta/shell-proyect/cron.log 2>&1
+\end{lstlisting}
+  \caption{Configuración de cron para ejecución diaria}
+\end{figure}
+
+\textbf{Finalización controlada:} El cierre lo da mecanismo de finalización mediante \texttt{trap}. Al capturar código de retorno global, se imprime línea final inequívoca en \texttt{log.txt}: éxito si código es 0; error con código concreto en caso contrario. Esto evita falsos positivos y simplifica revisión.
+
+En términos prácticos, con estos elementos la descarga encaja en marco que no depende del contexto: script sabe dónde escribir, cron sabe cómo lanzarlo y ambos dejan huella. Como mejora opcional, si se teme que dos ejecuciones coincidan, puede añadirse antisolapamiento con \texttt{flock}.
 
