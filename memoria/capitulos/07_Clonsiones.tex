@@ -1,0 +1,6 @@
+\chapter{Conclusiones y trabajo futuro}
+
+El proyecto cumple su objetivo: disponer cada día a las 08:00 de un resumen trazable de precios en Valencia. La automatización descarga el dataset oficial, lo valida y normaliza y genera dos salidas (TXT/HTML), dejando un rastro de ejecución claro de principio a fin.
+Se ha priorizado la robustez: anclaje a BASE_DIR, versionado por RUN_ID, separación de log.txt (funcional) y cron.log (planificador), y un flujo que valida antes de calcular y falla con diagnóstico si algo no cuadra. La normalización (coma→punto, tonumber?) garantiza métricas y ordenaciones consistentes.
+Como mejoras no disruptivas: parametrizar provincia/combustibles, ajustar la frecuencia, peticiones condicionales (ETag/Last-Modified), notificaciones en error, antisolapamiento con flock, rotación de logs, contenedor y pruebas (shellcheck/bats), y exportación adicional (CSV/JSON) u ordenación en el HTML.
+En conjunto, se entrega una base sólida y auditable, fácil de mantener y lista para escalar sin reescritura. La promesa es simple y valiosa: cada mañana, un panorama fiable y fácil de leer para pagar menos al repostar.
