@@ -1,5 +1,5 @@
-% Documento principal de la memoria del proyecto
-\documentclass[12pt,a4paper,twoside,openright]{report}
+\documentclass[12pt,a4paper, openright]{report}
+\nocite{*}
 
 % Configuración y paquetes
 \input{config/paquetes}
@@ -7,8 +7,8 @@
 \input{config/comandos}
 
 % Metadatos del documento
-\title{Análisis de Precios de Gasolineras en Valencia}
-\author{Tu Nombre}
+\title{Shell en entornos Linux: Proyecto de la asignatura}
+\author{Proyecto de la asignatura}
 \date{\today}
 
 \begin{document}
@@ -16,14 +16,8 @@
 % Portada
 \input{config/portada}
 
-% Índices
-\frontmatter
 \tableofcontents
-\listoffigures
-\listoftables
 
-% Cuerpo del documento
-\mainmatter
 
 % Capítulos
 \input{capitulos/01_introduccion}
@@ -32,18 +26,5 @@
 \input{capitulos/04_diseno}
 \input{capitulos/05_implementacion}
 \input{capitulos/06_resultados}
-\input{capitulos/07_conclusiones}
-
-% Material adicional
-\backmatter
-
-% Bibliografía
-\bibliographystyle{plain}
-\bibliography{bibliografia}
-
-% Apéndices
-\appendix
-\input{apendices/A_codigo}
-\input{apendices/B_manual}
 
 \end{document}

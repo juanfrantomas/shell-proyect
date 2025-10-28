@@ -1,38 +1,13 @@
-\chapter{Objetivos}
+\chapter{FUENTE DE DATOS Y DESCARGA}
 
-\section{Objetivo general}
+El sistema se apoya en datos públicos de precios de estaciones de servicio para la provincia de Valencia, servidos en JSON mediante un endpoint estable y accesible sin autenticación. Esto es clave por dos razones. Primero, permite ejecución desatendida: al no depender de formularios ni tokens, la petición se integra sin fricción en una tarea programada. Segundo, el formato JSON facilita la verificación estructural y la extracción precisa de campos antes de cualquier tratamiento, de modo que lo que llega al informe está respaldado por un documento coherente.
 
-Desarrollar un sistema automatizado que permita el análisis periódico de los precios de combustibles en las estaciones de servicio de Valencia, generando informes informativos que faciliten la toma de decisiones de los usuarios.
+La obtención se realiza con una petición HTTP idempotente mediante \texttt{curl} en modo silencioso, adecuada para cron. Se fija la cabecera \texttt{Accept: application/json} para evitar ambigüedades en la negociación de contenido, se vuelca la respuesta a fichero y se captura el código de estado HTTP en la variable \texttt{status} con \texttt{-w '\%\{http\_code\}'}. Con esa señal decidimos si proseguir o abortar antes de tocar el JSON: solo continuamos ante un 2xx. En caso contrario, el script corta la ejecución y deja un mensaje claro en el log. Filosofía: ``fallar pronto y con diagnóstico comprensible'', porque no hay un operador mirando la consola.
 
-\section{Objetivos específicos}
+El fichero se guarda con un identificador temporal (\texttt{RUN\_ID}) en el nombre. No es un detalle estético: asegura la trazabilidad de extremo a extremo. Una ejecución concreta (por ejemplo, 24/10/2025 a las 08:00) deja, bajo ese \texttt{RUN\_ID}, el JSON original, los informes en TXT y HTML y las entradas correspondientes en el log. Si más tarde surge una duda o una anomalía, es posible reconstruir qué datos se usaron y qué cálculo se hizo sin mezclar artefactos de distintos días.
 
-\begin{objetivos}
-  \item Implementar un mecanismo de obtención de datos desde la API pública del Ministerio
-  \item Diseñar un proceso de transformación y limpieza de datos JSON
-  \item Calcular estadísticas relevantes (precios mínimos, máximos y medios)
-  \item Generar rankings de las estaciones más económicas
-  \item Producir informes en formato HTML y texto plano
-  \item Automatizar la ejecución mediante tareas programadas (cron)
-  \item Implementar control de errores y registro de logs
-  \item Optimizar el rendimiento mediante caché local
-\end{objetivos}
+La fuente incluye, además, una marca temporal propia (\texttt{Fecha}) que recoge el momento de actualización oficial del dataset. Por eso el sistema maneja dos referencias temporales complementarias: la fecha y hora de ejecución (cuando corre el cron, ver Punto 3) y la fecha de la API (cuándo se actualizaron los datos en el proveedor). En los informes se muestran ambas para que el lector entienda si está viendo resultados de hoy y de qué actualización proceden.
 
-\section{Alcance del proyecto}
+Un aspecto práctico del dataset: muchos campos numéricos (por ejemplo, precios) vienen con coma decimal. No afecta a la descarga, pero sí al uso. Si no se normaliza a punto decimal y no se tipa a número, cálculos como medias, mínimos u ordenaciones fallan o arrojan resultados inconsistentes. Este punto se resuelve en el Punto 4 (Proceso y validaciones) con normalización y tipado mediante \texttt{jq}. La planificación que da la cadencia adecuada y gestiona redirecciones de salida/errores se detalla en el Punto 3 (Arquitectura y automatización).
 
-El proyecto se centra en:
-
-\begin{itemize}
-  \item Análisis de datos de la provincia de Valencia (código 46)
-  \item Tipos de combustible: Gasolina 95 y Diésel
-  \item Generación de informes estáticos (HTML y TXT)
-  \item Ejecución en sistemas Linux/Unix con Bash
-\end{itemize}
-
-\section{Limitaciones}
-
-\begin{itemize}
-  \item No incluye interfaz web interactiva
-  \item Depende de la disponibilidad de la API gubernamental
-  \item Requiere herramientas externas: \code{curl} y \code{jq}
-  \item No implementa historial de precios a largo plazo
-\end{itemize}
+Con la fuente y la mecánica de obtención definidas, falta encajar su lugar en el proyecto y su repetición diaria. Para que cada descarga termine en el directorio correcto, conserve su \texttt{RUN\_ID} y deje un rastro auditable, la ejecución no puede depender de acciones manuales ni de variables de entorno cambiantes. El siguiente apartado define la arquitectura mínima (árbol de carpetas y nombres de ficheros) y la automatización que la hace operativa (planificación, rutas absolutas y redirección de salidas). Sobre esa base estable se apoyarán las validaciones y los informes.
