@@ -2,7 +2,7 @@
 
 Este apartado coloca la descarga dentro de arquitectura mínima y repetible, detallando automatización diaria. La idea: al ejecutarse desde cron, el proyecto hace siempre lo mismo, en el mismo sitio, dejando rastro inequívoco, sin depender del usuario.
 
-\textbf{Estructura de directorios:} La arquitectura parte de directorio base anclado al script. En ejecución programada el directorio de trabajo no es predecible; por eso se obtiene \texttt{BASE\_DIR} a partir de ruta real del script y todas las lecturas/escrituras cuelgan de ahí. Esto evita efectos de \texttt{pwd} variables y asegura que artefactos terminen bajo el proyecto.
+\textbf{Estructura de directorios:} La arquitectura parte de directorio base anclado al script. En ejecución programada el directorio de trabajo no es predecible; por eso se obtiene \texttt{BASE\_DIR} a partir de ruta real del script y todas las lecturas/escrituras cuelgan de ahí. Esto evita efectos de \texttt{pwd} variables, la estructura del proyecto es la siguiente:
 
 \begin{figure}[H]
   \centering
@@ -23,36 +23,42 @@ shell-proyect/
   \caption{Estructura de directorios del proyecto}
 \end{figure}
 
-A partir de \texttt{BASE\_DIR} se organizan tres subcarpetas: \texttt{datos/} para JSON crudo, \texttt{informes/} para salidas en TXT y HTML, y \texttt{planificacion/} para material de cron. El árbol facilita revisión y entrega con orden, y permite reconstruir ejecución concreta si algo falla.
+A partir de \texttt{BASE\_DIR} se organizan tres subcarpetas: \texttt{datos/} para JSON crudo, \texttt{informes/} para salidas en TXT y HTML, y \texttt{planificacion/} para material de cron. El árbol facilita revisión y entrega con orden, y permite reconstruir la ejecución concreta si algo falla.
 
-Para que estructura exista incluso en primera ejecución, el script abre con función de preparación de carpetas. Además de crear lo que falte con \texttt{mkdir -p}, deja constancia en registro, permitiendo auditar estado del entorno.
+Para que la estructura exista incluso en primera ejecución, el script se abre con la función de preparación de carpetas. Además de crear lo que falte con \texttt{mkdir -p}, deja constancia en registro, permitiendo auditar el estado del entorno.
 
-\textbf{Trazabilidad y registro:} Se apoya en convención de nombres alrededor de \texttt{RUN\_ID}. Ese valor se inserta en nombres del JSON descargado y de informes generados, encapsulando cada ejecución bajo su propio sello temporal. Se mantienen dos registros complementarios:
+\textbf{Trazabilidad y registro:} Los nombres se basan utilizando el sufijo \texttt{RUN\_ID}. Ese valor se inserta en los nombres del JSON descargado y de los informes generados, encapsulando cada ejecución bajo su propio sello temporal. Se mantienen dos registros complementarios:
 
 \begin{itemize}[noitemsep]
   \item \texttt{log.txt}: Bitácora funcional del proceso (descarga, procesamiento, informes)
   \item \texttt{cron.log}: Traza del planificador (stdout/stderr de cron)
 \end{itemize}
 
-Separarlos acelera diagnóstico: si cron no encuentra script o falla PATH, evidencia en \texttt{cron.log}; si falla validación o cálculo, documentado en \texttt{log.txt}.
+Separarlos acelera el diagnóstico: si el cron no encuentra script o falla, deja evidencia en \texttt{cron.log}; si falla la validación o el cálculo lo documenta en \texttt{log.txt}.
 
-\textbf{Automatización con cron:} Se resuelve con entrada diaria. Tres decisiones garantizan estabilidad: (i) rutas absolutas al intérprete, script y ficheros de log; (ii) definición explícita de \texttt{SHELL} y \texttt{PATH} al inicio del bloque; (iii) redirección de salida estándar y error al \texttt{cron.log} del proyecto. La línea de cron se guarda en \texttt{planificacion/crontab.txt}.
+\textbf{Automatización con cron:} La implementación se despliega en servidor de Google Cloud para garantizar disponibilidad continua. El proceso de configuración sigue estos pasos sistemáticos:
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{Preparación del entorno:} Clonado del repositorio desde GitHub (\url{https://github.com/juanfrantomas/shell-proyect}) en directorio home del servidor
+  \item \textbf{Verificación de permisos:} Confirmación de que el script es ejecutable mediante \texttt{chmod +x}
+  \item \textbf{Configuración de crontab:} Edición con \texttt{crontab -e} para añadir tarea horaria
+  \item \textbf{Validación del servicio:} Comprobación de estado activo de \texttt{cron.service} y monitoreo de logs del sistema
+\end{enumerate}
+
+La línea de cron implementa ejecución cada hora con redirección completa de salidas. La redirección  \texttt{ cron.log 2>\&1 } captura errores críticos de permisos, sintaxis o inicialización que podrían impedir la creación del log funcional interno.
 
 \begin{figure}[H]
   \footnotesize
   \begin{lstlisting}[language=bash]
-# Configuracion de cron en crontab
-SHELL=/bin/bash
-PATH=/usr/local/bin:/usr/bin:/bin
-
-# Ejecucion diaria a las 8:00 AM
-0 8 * * * /ruta/absoluta/shell-proyect/analisis_json.sh \
-  >> /ruta/absoluta/shell-proyect/cron.log 2>&1
+# Configuracion en crontab -e
+0 * * * * /usr/bin/env bash /home/juanfrandeveloper/master/shell-proyect/analisis_json.sh >> /home/juanfrandeveloper/master/shell-proyect/cron.log 2>&1
 \end{lstlisting}
-  \caption{Configuración de cron para ejecución diaria}
+  \caption{Configuración de cron para ejecución cada hora}
 \end{figure}
+
+El servicio \texttt{cron} mantiene estado activo permanente, garantizando la automatización sin intervención manual.
 
 \textbf{Finalización controlada:} El cierre lo da mecanismo de finalización mediante \texttt{trap}. Al capturar código de retorno global, se imprime línea final inequívoca en \texttt{log.txt}: éxito si código es 0; error con código concreto en caso contrario. Esto evita falsos positivos y simplifica revisión.
 
-En términos prácticos, con estos elementos la descarga encaja en marco que no depende del contexto: script sabe dónde escribir, cron sabe cómo lanzarlo y ambos dejan huella. Como mejora opcional, si se teme que dos ejecuciones coincidan, puede añadirse antisolapamiento con \texttt{flock}.
+En términos prácticos, con estos elementos la descarga encaja en marco que no depende del contexto: script sabe dónde escribir, cron sabe cómo lanzarlo y ambos dejan huella. Como mejora opcional, si se teme que dos ejecuciones coincidan, puede añadirse antisolapamiento con \texttt{flock}, si el job anterior sigue corriendo, flock detecta el lock y no inicia otro.
 

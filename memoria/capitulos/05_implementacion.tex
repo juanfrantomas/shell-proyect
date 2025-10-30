@@ -1,15 +1,15 @@
 \chapter{GENERACIÓN DE INFORMES}
 
-Con el dataset validado y normalizado, este apartado mide y presenta. El objetivo: calcular indicadores básicos por combustible (conteo, mínimo, media, máximo) y ofrecer resultado en TXT para lectura rápida y HTML para consulta en pantalla, manteniendo trazabilidad por \texttt{RUN\_ID}.
+Con el dataset validado y normalizado, este apartado mide y presenta. El objetivo: calcular indicadores básicos por combustible (conteo, mínimo, media, máximo) y ofrecer resultado en TXT para la lectura rápida y HTML para consultar en pantalla, manteniendo trazabilidad mediante el \texttt{RUN\_ID}.
 
-\textbf{Cálculo de métricas:} Se parte de los subconjuntos preparados. Para cada combustible se obtiene conteo de estaciones con precio válido y, si mayor que cero, se calculan mínimo, máximo y media aritmética. Esta precaución evita divisiones por cero. El trabajo opera sobre valores numéricos reales, haciendo ordenación y agregación directa y fiable.
+\textbf{Cálculo de métricas:} Se parte de los subconjuntos preparados. Para cada combustible se obtiene conteo de estaciones con precio válido y, si es mayor que cero, se calculan mínimo, máximo y media aritmética. Esta precaución evita divisiones por cero. El trabajo opera sobre valores numéricos reales, haciendo ordenación y agregación directa y fiable.
 
-Además de estadísticas globales, se incluye Top-5 con mejor precio. Se ordena por precio ascendente y se extraen las cinco mejores (o las disponibles si hay menos). No es un ránking complejo, sino una pista diaria de dónde mirar primero.
+Además de estadísticas globales, se incluye Top-5 con mejores precios. Se ordena por precio ascendente y se extraen las cinco mejores.
 
 \begin{figure}[H]
   \footnotesize
   \begin{lstlisting}[language=bash]
-# Metricas y Top-5 para Gasolina 95
+# Metricas y Top-5
 G95_COUNT=$(echo "$estaciones" | jq '
   [ .[] | .priceGasolina ] | map(select(.!=null)) | length')
 
@@ -34,12 +34,13 @@ fi
   \caption{Cálculo de métricas y Top-5 por combustible}
 \end{figure}
 
-\textbf{Formateo unificado:} Internamente se usa punto decimal; hacia el usuario se muestra con coma y tres decimales para mantener homogeneidad. El mismo criterio se aplica en cabeceras y filas del Top-5, evitando discrepancias entre formatos:
+\textbf{Formateo unificado:} Internamente se usa punto decimal; para el usuario se le muestra con coma y tres decimales para mantener homogeneidad. El mismo criterio se aplica en cabeceras y filas del Top-5, evitando discrepancias entre formatos:
 
 \texttt{(. * 1000 | round / 1000) | tostring | gsub("\\textbackslash\\textbackslash."; ",")}
 
-\textbf{Informe TXT:} Prioriza lectura inmediata. Abre con cabecera que muestra \texttt{FECHA\_CRON} y \texttt{FECHA\_API}, seguida de dos bloques (Gasolina 95 y Diésel A) con conteo y estadísticas (mín/med/max). Debajo, lista numerada con Top-5 indicando rótulo, municipio, precio y dirección. Si un combustible carece de precios válidos, imprime aviso claro.
+\textbf{Informe TXT:} Prioriza lectura inmediata. Inicia con cabeceras que muestran \\
+\texttt{FECHA\_CRON} y \texttt{FECHA\_API}, seguidamente de dos bloques (Gasolina 95 y Diésel A) con conteo y estadísticas (mín/med/max). Debajo, muestra una lista numerada con las Top-5 indicando el nombre, precio y dirección.
 
-\textbf{Informe HTML:} Ofrece misma información organizada en tablas con capa visual mínima. Incluye encabezado con fechas y, por combustible, título con insignias de min/med/max. Cada fila del Top-5 recibe clase según relación con la media (\texttt{low}, \texttt{avg}, \texttt{high}) para resaltar lo más barato. HTML autoinclusivo con estilos embebidos. Ver implementación completa en el repositorio.
+\textbf{Informe HTML:} Ofrece misma información organizada en tablas con estilo. Incluye encabezado con fechas y, por combustible, título con insignias de min/med/max. La tabla muestra las columnas: ID, Nombre, Dirección, Latitud, Longitud, Precio Gasolina (€).
 
-Ambos informes se nombran con \texttt{RUN\_ID} y guardan en \texttt{informes/}, preservando trazabilidad: al ver un informe, se localizan el JSON crudo y traza del log. El script deja constancia con mensajes INFO de generación TXT y HTML, permitiendo comprobar si la ejecución terminó bien y qué artefactos produjo.
+Ambos informes se nombran con \texttt{RUN\_ID} y guardan en \texttt{informes/}, preservando trazabilidad. El script deja constancia con mensajes INFO de la generación del TXT y HTML, permitiendo comprobar si la ejecución terminó bien y qué documenntos produjo.

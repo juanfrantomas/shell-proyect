@@ -1,8 +1,8 @@
 \chapter{VALIDACIÓN DE DATOS}
 
-Este apartado convierte la descarga del Punto 2 en un conjunto de datos fiable y utilizable. La regla es clara: no se calcula nada hasta demostrar que la respuesta tiene estructura coherente, campos críticos existentes y valores numéricos correctamente tipados. Todo queda registrado en el log para auditoría posterior.
+Este apartado convierte la descarga del Punto 2 en un conjunto de datos fiable y utilizable. La regla es clara: no se calcula nada hasta demostrar que la respuesta tiene estructura coherente, campos críticos existentes y valores numéricos correctamente tipados. Todo queda registrado en el log para una auditoría posterior.
 
-El flujo comienza con comprobaciones de mínimos: variable no vacía, JSON bien formado con \texttt{jq empty}, presencia del array \texttt{ListaEESSPrecio} y campo \texttt{Fecha}. Este orden permite ``fallar pronto'' con mensaje inequívoco. Se extrae \texttt{FECHA\_API} para mostrarla en informes junto a \texttt{FECHA\_CRON}.
+El flujo comienza con comprobaciones de mínimos: variables no vacías,si JSON esta bien formado con \texttt{jq empty}, con presencia del array \texttt{ListaEESSPrecio} y el campo \texttt{Fecha}. Este orden permite ``fallar pronto'' con mensaje inequívoco. Se extrae \texttt{FECHA\_API} para mostrarla en informes junto a \texttt{FECHA\_CRON}.
 
 \textbf{Validación inicial:} El código verifica estructura y campos críticos (ver script completo en el repositorio):
 
@@ -13,7 +13,7 @@ El flujo comienza con comprobaciones de mínimos: variable no vacía, JSON bien 
   \item Extracción de \texttt{FECHA\_API}
 \end{itemize}
 
-\textbf{Normalización y tipado:} El dataset publica decimales con coma. Se aplica normalización explícita con \texttt{gsub(","; ".")} y cast seguro \texttt{tonumber?}, asignando \texttt{null} si no es convertible. Se seleccionan y renombran campos (\texttt{precio\_g95}, \texttt{precio\_diesel}, \texttt{lat}, \texttt{lon}) conservando atributos útiles (\texttt{rotulo}, \texttt{municipio}, \texttt{direccion}). El resultado: array \texttt{estaciones} con precios numéricos reales y coordenadas válidas o nulas bien declaradas.
+\textbf{Normalización y tipado:} El dataset publica decimales con coma. Se aplica normalización explícita con \texttt{gsub(","; ".")} y cast seguro \texttt{tonumber?}, asignando \texttt{null} si no es convertible. Se seleccionan y renombran los campos (\texttt{precio\_g95}, \texttt{precio\_diesel}, \texttt{lat}, \texttt{lon}) conservando atributos útiles (\texttt{rotulo}, \texttt{localidad}, \texttt{provincia}, \texttt{direccion}). El resultado: un array \texttt{estaciones} con precios numéricos reales y coordenadas válidas o nulas bien declaradas.
 
 \begin{figure}[H]
   \footnotesize
@@ -41,10 +41,10 @@ estaciones=$(echo "$getEstacionesValencia" | jq '[
   \caption{Normalización y tipado con jq (extracto)}
 \end{figure}
 
-\textbf{Métricas de calidad:} Se mide la calidad registrando cuatro magnitudes: total de estaciones, estaciones sin precio G95, sin precio Diésel y sin coordenadas. Estos contadores permiten relacionar anomalías (top corto, media extraña) con carencias del dataset, sin aparecer en el informe final pero sí en el log técnico.
+\textbf{Métricas de calidad:} Se mide la calidad registrando cuatro magnitudes: total de estaciones, estaciones sin precio G95, sin precio Diésel y sin coordenadas. Estos contadores permiten relacionar anomalías (una media extraña) en el dataset, sin aparecer en el informe final pero sí en el log.
 
-\textbf{Filtrado por combustible:} Se preparan subconjuntos con criterio conservador: solo estaciones con precio numérico válido. Este filtrado temprano garantiza que los módulos trabajen sobre información consistente y simplifica la lectura del script.
+\textbf{Filtrado por combustible:} Se preparan subconjuntos: solo estaciones con precio numérico válido. Este filtrado temprano garantiza que los módulos trabajen sobre información consistente y simplifica la lectura del script.
 
-\textbf{Guardarraíl:} Si ningún combustible dispone de precios válidos tras filtrar, el proceso se detiene con error claro. Es preferible declarar ``no hay datos útiles'' a producir informes vacíos. El log explica el motivo y permite diagnóstico rápido.
+\textbf{Validación final:} Si ningún combustible dispone de precios válidos tras filtrar, el proceso se detiene con error claro. Es preferible declarar ``no hay datos útiles'' a producir informes vacíos. El log explica el motivo y permite diagnóstico rápido.
 
 Con estas validaciones, normalizaciones y controles, el proyecto entrega un dataset tipado, segmentado y coherente al Punto 5 para medición y presentación.
