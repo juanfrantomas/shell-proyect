@@ -1,6 +1,6 @@
 \chapter{REGISTRO Y AUDITORÍA}
 
-Este apartado define cómo se audita cada ejecución y qué señales permiten juzgar su calidad. Leyendo el log puede saberse qué pasó, cuándo, en qué fase, con qué resultado y calidad de datos. Se usan mensajes con marca temporal ISO (\texttt{[\%F \%T]}), taxonomía de fases alineada con el flujo, niveles simples (INFO, OK, ERROR) y línea de finalización inequívoca que refleja el código de salida. Se separan dos canales: \texttt{log.txt} (bitácora funcional del script) y \texttt{cron.log} (stdout/stderr de cron). Con esto, diagnosticar incidencias lleva segundos.
+Este apartado define cómo se audita cada ejecución y qué señales permiten juzgar su calidad. Leyendo el log puede saberse qué pasó, cuándo, en qué fase, con qué resultado y calidad de datos. Se usan mensajes con marca temporal (\texttt{[\%F \%T]}), taxonomía de fases alineada con el flujo, niveles simples (INFO, OK, ERROR) y línea de finalización inequívoca que refleja el código de salida. Se separan dos canales: \texttt{log.txt} (bitácora funcional del script) y \texttt{cron.log} (stdout/stderr de cron). Con esto, diagnosticar incidencias lleva segundos.
 
 \textbf{Formato y fases:} Cada línea empieza por \texttt{[YYYY-MM-DD HH:MM:SS]}, sigue con fase entre paréntesis (Inicio, Descarga, Procesamiento, Indicadores, Informe, Finalizacion), nivel y mensaje claro. Las fases siguen el flujo, facilitando localizar problemas. Niveles: INFO (hitos), OK (chequeos superados), ERROR (fallos críticos con \texttt{exit 1}).
 
@@ -26,9 +26,9 @@ echo "[$(date '+%F %T')] (Informe) OK Informe generado: $TXT"
   \caption{Formato de mensajes y fases del log}
 \end{figure}
 
-\textbf{Gestión de errores:} Cuando aparece ERROR, el criterio es salida controlada: registrar motivo e interrumpir con \texttt{exit 1}. Esto evita falsos positivos (informes con datos corruptos) y deja pista inequívoca. Ejemplos: HTTP no 2xx o JSON inválido.
+\textbf{Gestión de errores:} Cuando aparece ERROR, el criterio es una salida controlada: registrar el motivo e interrumpir con \texttt{exit 1}. Esto evita falsos positivos (informes con datos corruptos) y deja pista inequívoca. Ejemplos: HTTP no 2xx o JSON inválido.
 
-\textbf{Finalización con trap:} Se usa \texttt{trap} para capturar código de salida y escribir línea de cierre. Si código es 0, indica éxito; si no, informa del código. Leer el último bloque de \texttt{log.txt} basta para saber si el día terminó bien o mal.
+\textbf{Finalización con trap:} Se usa \texttt{trap} para capturar código de salida y escribir línea de cierre. Si código es 0, indica éxito; si no, informa del código. Leer el último bloque de \texttt{log.txt} basta para saber si la ejecución terminó bien o mal.
 
 \begin{figure}[H]
   \footnotesize
@@ -46,10 +46,8 @@ fi' EXIT
 
 \textbf{Separación de logs:} \texttt{log.txt} recoge lo que hace el script (fases, validaciones, indicadores); \texttt{cron.log} captura cómo se lanzó (errores de ruta, permisos, PATH incompleto). Esto diferencia problemas antes de entrar al script vs. durante ejecución.
 
-\textbf{Señales de calidad:} El log anota total de estaciones, cuántas carecen de precio G95/Diésel y cuántas sin coordenadas. Si un día el Top-5 es corto o la media extraña, el log permite atribuirlo a carencia de la fuente, no error en la lógica.
+\textbf{Señales de calidad:} El log anota el total de las estaciones, cuántas carecen de precio G95/Diésel y cuántas estan sin coordenadas. Si un día la media es extraña, el log permite atribuirlo a carencia de la fuente, no error en la lógica.
 
-\textbf{Trazabilidad:} Todo se ancla en \texttt{RUN\_ID}. Aunque no aparece en cada línea, sí en mensajes clave (rutas de informes generados), permitiendo saltar del log al TXT/HTML y JSON crudo correspondiente para auditoría reproducible.
+\textbf{Trazabilidad:} Todo se ancla en \texttt{RUN\_ID}. Aunque no aparece en cada línea, sí en mensajes clave (rutas de informes generados), permitiendo saltar del log al TXT/HTML y JSON crudo correspondiente para hacer la auditoría reproducible.
 
-\textbf{Buenas prácticas:} Timestamp ISO para ordenación, mensajes concisos y accionables, locale consistente en formato de precios. Para instalaciones con semanas de ejecución, recomendable rotar logs con política sencilla (retener 7 días, comprimir y truncar) usando logrotate.
-
-Con este esquema, el proyecto no solo hace (descarga, valida, calcula, informa), también explica lo que hace de manera legible y verificable: resolución rápida de incidencias y confianza en que cada informe está respaldado por rastro claro desde dato crudo hasta línea final de éxito o error.
+Con este esquema, el proyecto no solo descarga, valida, calcula e informa, también explica lo que hace de manera legible y verificable: resolución rápida de incidencias y confianza en que cada informe está respaldado por rastro claro desde el dato crudo hasta la línea final de éxito o error.
